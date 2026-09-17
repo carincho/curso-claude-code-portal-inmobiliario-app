@@ -2,32 +2,37 @@
 
 ## 1. Arquitectura
 
-Next.js se utilizará como framework full stack manteniendo una arquitectura REST clara.
+El proyecto es un **monorepo** (npm workspaces + Turborepo) con el frontend y el backend completamente separados, cada uno su propia aplicación Next.js:
 
 ```text
-Next.js + React
-      │
-    fetch()
-      │
-      ▼
-API REST /api/**
-      │
-      ▼
-Capa de servicios
-      │
-      ▼
-Repositorio / ORM
-      │
-      ▼
-PostgreSQL
+apps/web  (frontend, Next.js)          apps/api  (backend, Next.js)
+      │                                       │
+    fetch() ── API_URL ──────────────►  API REST /api/**
+   (server-side, entre procesos)              │
+                                               ▼
+                                        Capa de servicios
+                                               │
+                                               ▼
+                                        Repositorio / ORM
+                                               │
+                                               ▼
+                                          PostgreSQL
 ```
+
+`apps/web` no importa Prisma ni accede a la base de datos bajo ninguna circunstancia: todo dato pasa por `fetch()` contra `apps/api`, que es la única app con acceso a PostgreSQL. `apps/web` no tiene ni sabe conectarse a PostgreSQL; solo conoce la URL pública de `apps/api` (variable `API_URL`).
+
+`apps/api` no renderiza UI: es una app Next.js compuesta únicamente por Route Handlers (`app/api/**`), sin `page.tsx` propio.
+
+Ambas apps corren en puertos distintos en desarrollo (`web` en `3000`, `api` en `3001`), por lo que las respuestas de `apps/api` incluyen cabeceras CORS (origen configurable vía `CORS_ALLOWED_ORIGIN`) para soportar además llamadas futuras desde el navegador (Client Components).
+
+Tipos compartidos entre ambas apps (DTOs de la API pública, como `PropertyListItem`/`PropertyDetail`) viven en `packages/shared-types`, un paquete del workspace sin lógica de negocio ni dependencia de Prisma — solo tipos TypeScript.
 
 Integraciones externas:
 
 ```text
-Cloudinary  → imágenes
-Google Maps → ubicación
-Web3Forms   → contacto
+Cloudinary  → imágenes       (apps/api)
+Google Maps → ubicación      (apps/web)
+Web3Forms   → contacto       (apps/api, envío server-side)
 ```
 
 ## 2. Tecnologías obligatorias
@@ -49,25 +54,34 @@ Web3Forms   → contacto
 - No exigir latitud/longitud en el formulario ADMIN.
 - No implementar funcionalidades especulativas fuera de `spec.md`.
 
-## 4. Estructura sugerida
+## 4. Estructura del monorepo
 
 ```text
-src/
-├── app/
-│   ├── api/
-│   ├── admin/
-│   ├── account/
-│   ├── properties/
-│   └── ...
-├── components/
-├── services/
-├── repositories/
-├── lib/
-├── types/
-└── ...
+.
+├── apps/
+│   ├── web/                   # Frontend Next.js (puerto 3000)
+│   │   ├── src/
+│   │   │   ├── app/           # Páginas y layouts (App Router)
+│   │   │   ├── components/
+│   │   │   └── lib/           # Clientes REST, formato, utilidades
+│   │   └── public/
+│   │
+│   └── api/                   # Backend Next.js (puerto 3001, solo Route Handlers)
+│       ├── prisma/            # schema.prisma, migrations, seed
+│       └── src/
+│           ├── app/api/       # Route Handlers
+│           ├── services/
+│           ├── repositories/
+│           └── lib/           # prisma client, http-error, cors
+│
+├── packages/
+│   └── shared-types/          # DTOs compartidos (sin dependencia de Prisma)
+│
+├── turbo.json
+└── package.json                # workspaces: apps/*, packages/*
 ```
 
-Adaptar cuando las convenciones actuales de Next.js lo justifiquen sin romper la separación de responsabilidades.
+Adaptar cuando las convenciones actuales de Next.js lo justifiquen sin romper la separación de responsabilidades ni la frontera entre `apps/web` y `apps/api`.
 
 ## 5. Modelo de datos
 
@@ -304,15 +318,20 @@ No exponer stack traces internos.
 
 ## 15. Variables de entorno
 
-Utilizar variables de entorno para:
+Cada app del monorepo tiene su propio `.env` / `.env.example` (sin secretos reales), con las variables que le corresponden:
 
-- conexión PostgreSQL;
-- secretos de autenticación;
-- credenciales Cloudinary;
-- configuración Google Maps;
-- clave Web3Forms.
+`apps/api/.env`:
 
-Crear `.env.example` sin secretos reales.
+- `DATABASE_URL` (conexión PostgreSQL);
+- `AUTH_SECRET` (secretos de autenticación);
+- credenciales Cloudinary (`CLOUDINARY_*`);
+- `WEB3FORMS_ACCESS_KEY`;
+- `CORS_ALLOWED_ORIGIN` (origen permitido de `apps/web`).
+
+`apps/web/.env`:
+
+- `API_URL` (URL de `apps/api`, usada server-side por el frontend para consumir la API REST);
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
 
 ## 16. Validación
 

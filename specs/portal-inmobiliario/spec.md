@@ -2,7 +2,7 @@
 
 ## 1. Visión del producto
 
-Construir un portal inmobiliario full stack orientado inicialmente al mercado chileno.
+Construir un portal inmobiliario full stack orientado inicialmente al mercado mexicano.
 
 Los visitantes podrán descubrir propiedades en venta o arriendo, buscarlas y filtrarlas, consultar su información completa, visualizar fotografías y una ubicación aproximada en el mapa, y solicitar información sobre una propiedad.
 

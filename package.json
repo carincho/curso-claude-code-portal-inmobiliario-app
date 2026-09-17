@@ -1,0 +1,19 @@
+{
+  "name": "portal-inmobiliario",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
+    "db:seed": "turbo run db:seed",
+    "db:studio": "npm run db:studio --workspace=api"
+  },
+  "devDependencies": {
+    "turbo": "^2.10.13"
+  }
+}

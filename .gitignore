@@ -1,13 +1,17 @@
 # Dependencias
 node_modules/
 
-# Build
-dist/
-dist-ssr/
+# next.js
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
 
-# Vite
-*.local
-.vite/
+# turborepo
+.turbo/
+
+# testing
+coverage/
 
 # Logs
 npm-debug.log*
@@ -24,12 +28,12 @@ yarn-error.log*
 Thumbs.db
 *.pem
 
-# next.js
-/.next/
-/out/
-
 # vercel
 .vercel
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# prisma generated client
+**/src/generated/
