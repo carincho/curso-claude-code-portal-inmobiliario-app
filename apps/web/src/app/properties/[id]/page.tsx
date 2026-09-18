@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PropertyGallery } from "@/components/properties/PropertyGallery";
+import { PropertyMap } from "@/components/properties/PropertyMap";
+import { buildPropertyAddress } from "@/lib/build-property-address";
 import { formatPrice } from "@/lib/format";
 import { OPERATION_TYPE_LABELS, PROPERTY_TYPE_LABELS } from "@/lib/property-labels";
 import { fetchPublicPropertyById } from "@/lib/properties-client";
@@ -109,6 +111,9 @@ export default async function PropertyDetailPage(props: PageProps<"/properties/[
         <h2 className="text-lg font-semibold text-stone-900">Ubicación</h2>
         <p className="mt-2 text-sm text-stone-700">{property.address}</p>
         <p className="text-sm text-stone-500">{location}</p>
+        <div className="mt-4">
+          <PropertyMap address={buildPropertyAddress(property)} title={property.title} />
+        </div>
       </section>
     </div>
   );
