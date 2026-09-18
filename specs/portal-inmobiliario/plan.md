@@ -32,7 +32,7 @@ Integraciones externas:
 ```text
 Cloudinary  → imágenes       (apps/api)
 Google Maps → ubicación      (apps/web)
-Web3Forms   → contacto       (apps/api, envío server-side)
+Web3Forms   → contacto       (apps/web, envío client-side; persistencia vía apps/api)
 ```
 
 ## 2. Tecnologías obligatorias
@@ -283,16 +283,25 @@ Si posteriormente se requiere geocodificación interna, debe ser transparente pa
 
 ## 13. Web3Forms
 
-Flujo:
+Web3Forms documenta su API como pensada para uso client-side: el envío server-side requiere
+plan pago de Web3Forms + whitelist de IP. Por eso el envío a Web3Forms se hace directamente desde
+el navegador (`apps/web`); el access key de Web3Forms está diseñado para exponerse en el cliente
+(equivalente a una site key pública), no es un secreto de backend.
 
-1. validar datos;
-2. identificar propiedad;
-3. identificar usuario autenticado cuando exista;
-4. persistir consulta;
-5. enviar mediante Web3Forms;
-6. devolver una respuesta REST consistente.
+La persistencia de la consulta en PostgreSQL sigue pasando exclusivamente por `apps/api`, como el
+resto del acceso a datos.
 
-Definir un comportamiento claro ante fallos para evitar perder silenciosamente una consulta.
+Flujo (orquestado desde el Client Component del formulario, en `apps/web`):
+
+1. validar datos en el cliente;
+2. `POST` a `apps/api` (`/api/inquiries`) para persistir la consulta — valida datos de nuevo en el
+   backend, identifica la propiedad (404 si no existe o no está publicada), identifica al usuario
+   autenticado cuando exista, y devuelve una respuesta REST consistente;
+3. si la persistencia fue exitosa, enviar la consulta a Web3Forms directamente desde el navegador
+   (best-effort: un fallo aquí no debe mostrarse como error al usuario, ya que la consulta ya
+   quedó guardada);
+4. si la persistencia falla, mostrar error al usuario — ese es el caso que no debe perderse
+   silenciosamente.
 
 ## 14. Errores
 
@@ -325,13 +334,13 @@ Cada app del monorepo tiene su propio `.env` / `.env.example` (sin secretos real
 - `DATABASE_URL` (conexión PostgreSQL);
 - `AUTH_SECRET` (secretos de autenticación);
 - credenciales Cloudinary (`CLOUDINARY_*`);
-- `WEB3FORMS_ACCESS_KEY`;
 - `CORS_ALLOWED_ORIGIN` (origen permitido de `apps/web`).
 
 `apps/web/.env`:
 
 - `API_URL` (URL de `apps/api`, usada server-side por el frontend para consumir la API REST);
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`;
+- `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (público por diseño de Web3Forms, ver §13).
 
 ## 16. Validación
 

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ContactForm } from "@/components/properties/ContactForm";
 import { PropertyGallery } from "@/components/properties/PropertyGallery";
 import { PropertyMap } from "@/components/properties/PropertyMap";
 import { buildPropertyAddress } from "@/lib/build-property-address";
 import { formatPrice } from "@/lib/format";
 import { geocodeAddress } from "@/lib/geocode-address";
+import { getApiUrl } from "@/lib/get-api-url";
 import { OPERATION_TYPE_LABELS, PROPERTY_TYPE_LABELS } from "@/lib/property-labels";
 import { fetchPublicPropertyById } from "@/lib/properties-client";
 
@@ -116,6 +118,16 @@ export default async function PropertyDetailPage(props: PageProps<"/properties/[
         <p className="text-sm text-stone-500">{location}</p>
         <div className="mt-4">
           <PropertyMap address={fullAddress} title={property.title} coordinates={coordinates} />
+        </div>
+      </section>
+
+      <section className="mt-8 border-t border-card-border pt-8">
+        <h2 className="text-lg font-semibold text-stone-900">Contactar sobre esta propiedad</h2>
+        <p className="mt-2 text-sm text-stone-600">
+          Completa el formulario y te contactaremos a la brevedad.
+        </p>
+        <div className="mt-4 max-w-md">
+          <ContactForm apiUrl={getApiUrl()} propertyId={property.id} propertyTitle={property.title} />
         </div>
       </section>
     </div>
