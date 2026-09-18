@@ -1,5 +1,15 @@
 # CLAUDE.md
 
+## Descripción de la app
+
+Portal inmobiliario full stack orientado al mercado mexicano. Los visitantes pueden descubrir,
+buscar y filtrar propiedades en venta o arriendo, ver su detalle completo (galería, ubicación,
+características) y solicitar información. Los usuarios registrados guardan propiedades favoritas
+y revisan sus consultas; los administradores gestionan el portal (propiedades, imágenes,
+características, usuarios y consultas) desde un área privada. Construido como monorepo con
+`apps/web` (frontend Next.js) y `apps/api` (backend Next.js solo API REST) sobre PostgreSQL — ver
+"Estado actual del proyecto" más abajo para el detalle de la arquitectura y el progreso.
+
 ## Instrucciones del proyecto
 
 Este proyecto utiliza **Spec-Driven Development (SDD)**.

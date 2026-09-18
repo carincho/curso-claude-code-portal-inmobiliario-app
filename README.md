@@ -20,6 +20,26 @@ Development (SDD)** con Claude Code.
 - **Integraciones**: Cloudinary (imágenes), Google Maps (ubicación) y Web3Forms (contacto) — se
   incorporan de forma incremental según el plan técnico.
 
+## Estado del proyecto
+
+Progreso según [`specs/portal-inmobiliario/tasks.md`](./specs/portal-inmobiliario/tasks.md),
+fuente de verdad del avance (14 de 37 pasos completados):
+
+| Fase | Estado | Pasos |
+|---|---|---|
+| 1 — Fundamentos | ✅ Completa | 1-5 |
+| 2 — Portal público | 🟡 En progreso (9/11) | 6-14 hechos · 15-16 pendientes |
+| 3 — Autenticación y usuario | ⬜ Pendiente | 17-21 |
+| 4 — Administración | ⬜ Pendiente | 22-30 |
+| 5 — Calidad y finalización | ⬜ Pendiente | 31-37 |
+
+**Ya funciona**: landing page, catálogo con búsqueda/filtros combinables/ordenamiento, detalle de
+propiedad con galería de imágenes, y la API REST pública detrás de todo (`GET /api/properties`,
+`GET /api/properties/{id}`).
+
+**Sigue** (Fase 2): integrar Google Maps en el detalle (Paso 15) y el formulario de contacto con
+Web3Forms (Paso 16) — luego continúa con autenticación, favoritos, y el panel de administración.
+
 ## Estructura del repositorio
 
 ```text
