@@ -5,6 +5,7 @@ import { PropertyGallery } from "@/components/properties/PropertyGallery";
 import { PropertyMap } from "@/components/properties/PropertyMap";
 import { buildPropertyAddress } from "@/lib/build-property-address";
 import { formatPrice } from "@/lib/format";
+import { geocodeAddress } from "@/lib/geocode-address";
 import { OPERATION_TYPE_LABELS, PROPERTY_TYPE_LABELS } from "@/lib/property-labels";
 import { fetchPublicPropertyById } from "@/lib/properties-client";
 
@@ -44,6 +45,8 @@ export default async function PropertyDetailPage(props: PageProps<"/properties/[
   const location = [property.commune, property.city, property.region]
     .filter(Boolean)
     .join(", ");
+  const fullAddress = buildPropertyAddress(property);
+  const coordinates = await geocodeAddress(fullAddress);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -112,7 +115,7 @@ export default async function PropertyDetailPage(props: PageProps<"/properties/[
         <p className="mt-2 text-sm text-stone-700">{property.address}</p>
         <p className="text-sm text-stone-500">{location}</p>
         <div className="mt-4">
-          <PropertyMap address={buildPropertyAddress(property)} title={property.title} />
+          <PropertyMap address={fullAddress} title={property.title} coordinates={coordinates} />
         </div>
       </section>
     </div>
