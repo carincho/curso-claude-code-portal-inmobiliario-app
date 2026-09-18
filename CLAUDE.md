@@ -75,11 +75,47 @@ Una tarea solo está terminada cuando:
 - Usar nombres de variables explícitos. No usar abreviaturas.
 - Cada nueva funcionalidad debe tener su prueba unitaria correspondiente.
 
+## Estado actual del proyecto
+
+### Estructura: monorepo
+El proyecto es un **monorepo** (npm workspaces + Turborepo), no una sola app Next.js:
+
+```text
+apps/web/               Frontend Next.js — puerto 3000. Sin acceso a Prisma/DB.
+apps/api/                Backend Next.js — puerto 3001. Solo Route Handlers + Prisma + servicios + repositorios.
+packages/shared-types/  DTOs compartidos entre ambas apps (sin dependencia de Prisma).
+```
+
+- `apps/web` consume `apps/api` exclusivamente vía `fetch()` a `API_URL` (nunca Prisma directo).
+- `apps/api` expone CORS (`CORS_ALLOWED_ORIGIN`) para las llamadas desde `apps/web`.
+- Levantar todo: `npm run dev` desde la raíz (arranca ambas apps en paralelo vía Turborepo).
+- Detalle completo de la arquitectura: `specs/portal-inmobiliario/plan.md` §1 y §4.
+
+### Base de datos y herramientas locales
+- PostgreSQL corre en Docker (contenedor `postgres`, imagen `pgvector/pgvector:pg16-trixie`), compartido con otros proyectos del equipo — la base de este proyecto es `portal_inmobiliario`, no tocar otras bases del mismo contenedor.
+- ORM: **Prisma 7** (pinneado explícitamente — `npm install prisma` resuelve "latest" a un release candidate 8.x, evitarlo) con `@prisma/adapter-pg`.
+- pgAdmin corre en Docker con `--restart always`, accesible en `http://localhost:5050`.
+
+### Progreso (Spec-Driven Development)
+- **Fase 1 — Fundamentos**: completa (Pasos 1-5).
+- **Fase 2 — Portal público**: en progreso. Completados: API REST pública con búsqueda/filtros/orden (Pasos 6, 10, 11, 12), landing page (Paso 7), `PropertyCard`/grid responsive (Paso 8), catálogo `/properties` (Paso 9), detalle `/properties/{id}` (Paso 13), galería de imágenes (Paso 14).
+- Progreso detallado y checklist: `specs/portal-inmobiliario/tasks.md`.
+
+### Sistema de diseño (frontend)
+Paleta definida como tokens CSS/Tailwind v4 en `apps/web/src/app/globals.css` (tema claro único, sin alternar automáticamente a modo oscuro):
+
+- **Header** (`bg-header` / `text-header-text`): gris azulado oscuro-medio (`#1e293b`), con efecto semitransparente + blur al hacer scroll.
+- **Cuerpo / tarjetas** (`bg-background` / `bg-card`): fondo general cálido claro, tarjetas en blanco con sombra para resaltar sobre el fondo.
+- **Acento** (`bg-accent` / `text-accent`): ámbar/terracota (`#c2410c`), usado en precios, badges de operación y botones principales.
+- **Footer** (`bg-footer` / `text-footer-text`): el tono más oscuro (`#0f172a`), distinto del header para dar jerarquía visual.
+
 ## Available Skills
 
 | Skill | Path | Description |
 |---|---|---|
 | `react-rules` | `.claude/skills/react-rules/SKILL.md` | Estándares de desarrollo y reglas de arquitectura para proyectos y componentes de React con TypeScript, Tailwind CSS, Zustand, Zod, React Hook Form y React Query / SWR. |
+| `vercel-react-best-practices` | `.claude/skills/vercel-react-best-practices/SKILL.md` | Guía de optimización de rendimiento para React/Next.js mantenida por Vercel Engineering (70 reglas: eliminar waterfalls, tamaño de bundle, rendimiento server-side, data fetching client-side, re-renders, rendering, JS y patrones avanzados). |
+| `web-design-guidelines` | `.claude/skills/web-design-guidelines/SKILL.md` | Revisión de código de UI contra las "Web Interface Guidelines" de Vercel (accesibilidad, estados de foco, formularios, animación, tipografía, contenido, imágenes, rendimiento, navegación/estado en URL, touch, dark mode, i18n, hidratación). |
 
 ---
 
@@ -95,3 +131,18 @@ Una tarea solo está terminada cuando:
   - Implementar formularios utilizando React Hook Form con resolver de Zod.
   - Implementar lógica de UI o fetching de APIs utilizando TanStack Query (React Query) o SWR.
   - Refactorizar código React para cumplir con principios de inmutabilidad, pureza y correcto uso de `useEffect`.
+
+### `vercel-react-best-practices`
+- **Activación**: Activar esta habilidad cuando el usuario pida (o cuando se esté a punto de):
+  - Escribir componentes React nuevos o páginas/rutas de Next.js (`apps/web`, `apps/api`).
+  - Implementar data fetching, ya sea server-side (Route Handlers, Server Components) o client-side.
+  - Revisar código existente en busca de problemas de rendimiento.
+  - Refactorizar código React/Next.js ya escrito.
+  - Optimizar tamaño de bundle o tiempos de carga (imports, dynamic imports, waterfalls de `await`).
+
+### `web-design-guidelines`
+- **Activación**: Activar esta habilidad cuando el usuario pida:
+  - Revisar la UI ("revisa mi UI", "audita el diseño").
+  - Verificar accesibilidad de componentes o páginas.
+  - Revisar UX o comparar contra mejores prácticas de interfaz web.
+  - Antes de dar por terminada una tarea de frontend con UI nueva o modificada, como chequeo de calidad (foco visible, labels, `aria-*`, formularios, tipografía, manejo de contenido largo/vacío, estado en la URL).

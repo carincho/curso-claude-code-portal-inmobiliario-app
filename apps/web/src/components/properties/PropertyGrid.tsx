@@ -1,11 +1,19 @@
 import { PropertyCard } from "@/components/properties/PropertyCard";
 import type { PropertyListItem } from "@portal-inmobiliario/shared-types";
 
-export function PropertyGrid({ properties }: { properties: PropertyListItem[] }) {
+type PropertyGridProps = {
+  properties: PropertyListItem[];
+  emptyMessage?: string;
+};
+
+export function PropertyGrid({
+  properties,
+  emptyMessage = "No hay propiedades disponibles por el momento.",
+}: PropertyGridProps) {
   if (properties.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        No hay propiedades disponibles por el momento.
+      <p className="rounded-lg border border-dashed border-card-border bg-card p-8 text-center text-sm text-stone-500">
+        {emptyMessage}
       </p>
     );
   }

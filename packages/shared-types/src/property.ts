@@ -44,3 +44,9 @@ export type PropertyDetail = PropertyListItem & {
   features: PropertyFeatureDTO[];
   updatedAt: string;
 };
+
+export type PropertyLocations = {
+  communes: string[];
+  cities: string[];
+  regions: string[];
+};

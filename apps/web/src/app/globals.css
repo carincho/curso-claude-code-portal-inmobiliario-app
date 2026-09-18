@@ -1,22 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* Fondo general: blanco cálido, no gris/negro */
+  --background: #fafaf7;
+  --foreground: #1c1917;
+
+  /* Header: gris azulado oscuro-medio (no negro) */
+  --header-bg: #1e293b;
+  --header-bg-solid: #1e293b;
+  --header-text: #f1f5f9;
+  --header-text-muted: #cbd5e1;
+
+  /* Footer: el tono más oscuro, con más "cuerpo" */
+  --footer-bg: #0f172a;
+  --footer-text: #cbd5e1;
+  --footer-text-muted: #94a3b8;
+
+  /* Tarjetas: blanco puro para que resalten sobre el fondo cálido */
+  --card-bg: #ffffff;
+  --card-border: #e7e5e4;
+
+  /* Acento cálido (ámbar/terracota) para precios, badges y botones */
+  --accent: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-foreground: #ffffff;
+  --accent-soft: #fff7ed;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-header: var(--header-bg);
+  --color-header-text: var(--header-text);
+  --color-footer: var(--footer-bg);
+  --color-footer-text: var(--footer-text);
+  --color-footer-text-muted: var(--footer-text-muted);
+  --color-card: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

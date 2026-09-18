@@ -1,10 +1,16 @@
+import type { PropertyFilters } from "@/lib/property-filters-schema";
 import { HttpError } from "@/lib/http-error";
 import {
+  findDistinctPublishedLocations,
   findPublishedProperties,
   findPublishedPropertyById,
   type PublishedProperty,
 } from "@/repositories/property.repository";
-import type { PropertyDetail, PropertyListItem } from "@portal-inmobiliario/shared-types";
+import type {
+  PropertyDetail,
+  PropertyListItem,
+  PropertyLocations,
+} from "@portal-inmobiliario/shared-types";
 
 function toListItem(property: PublishedProperty): PropertyListItem {
   const mainImage = property.images[0] ?? null;
@@ -57,8 +63,10 @@ function toDetail(property: PublishedProperty): PropertyDetail {
   };
 }
 
-export async function listPublicProperties(): Promise<PropertyListItem[]> {
-  const properties = await findPublishedProperties();
+export async function listPublicProperties(
+  filters: PropertyFilters = {},
+): Promise<PropertyListItem[]> {
+  const properties = await findPublishedProperties(filters);
   return properties.map(toListItem);
 }
 
@@ -70,4 +78,8 @@ export async function getPublicProperty(id: string): Promise<PropertyDetail> {
   }
 
   return toDetail(property);
+}
+
+export async function getPropertyLocations(): Promise<PropertyLocations> {
+  return findDistinctPublishedLocations();
 }
