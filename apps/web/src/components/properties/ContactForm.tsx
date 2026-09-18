@@ -29,7 +29,10 @@ export function ContactForm({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ContactFormValues>({ resolver: zodResolver(contactFormSchema) });
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: { message: "Quiero detalles sobre esta propiedad" },
+  });
 
   async function onSubmit(values: ContactFormValues) {
     setStatus("sending");
