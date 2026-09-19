@@ -120,7 +120,7 @@
   - Proteger páginas.
   - Aplicar permisos en backend.
 
-- [ ] **Paso 19 — Cuenta de usuario**
+- [x] **Paso 19 — Cuenta de usuario**
   - Crear `/account`.
   - Mostrar información básica.
   - Preparar secciones de propiedades interesadas y consultadas.

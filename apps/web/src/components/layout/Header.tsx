@@ -71,7 +71,12 @@ export function Header() {
           {!isLoading &&
             (user ? (
               <>
-                <span className="text-sm text-header-text/80">Hola, {user.name}</span>
+                <Link
+                  href="/account"
+                  className="text-sm text-header-text/80 hover:text-header-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text"
+                >
+                  Hola, {user.name}
+                </Link>
                 <button
                   type="button"
                   onClick={() => logout()}
@@ -156,18 +161,29 @@ export function Header() {
           })}
           {!isLoading &&
             (user ? (
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    void logout();
-                  }}
-                  className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-header-text hover:bg-white/10"
-                >
-                  Salir ({user.name})
-                </button>
-              </li>
+              <>
+                <li>
+                  <Link
+                    href="/account"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-header-text hover:bg-white/10"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Mi cuenta ({user.name})
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      void logout();
+                    }}
+                    className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-header-text hover:bg-white/10"
+                  >
+                    Salir
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <Link

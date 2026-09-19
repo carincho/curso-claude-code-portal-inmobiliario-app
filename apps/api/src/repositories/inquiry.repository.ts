@@ -13,3 +13,11 @@ export function createInquiry(data: CreateInquiryPayload, userId?: string) {
     },
   });
 }
+
+export function findInquiriesByUserId(userId: string) {
+  return prisma.inquiry.findMany({
+    where: { userId },
+    include: { property: { select: { id: true, title: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+}

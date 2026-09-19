@@ -37,6 +37,7 @@ Puede realizar todas las acciones públicas y además:
 
 - cerrar sesión;
 - acceder a su cuenta;
+- editar su información básica (nombre y email);
 - guardar propiedades como favoritas o interesadas;
 - eliminar propiedades guardadas;
 - consultar sus propiedades interesadas;
@@ -385,6 +386,9 @@ El área privada debe mostrar:
 - información básica;
 - propiedades interesadas;
 - propiedades consultadas.
+
+El usuario puede editar su nombre y email desde una página independiente
+(`/account/edit`), validando que el nuevo email no esté en uso por otra cuenta.
 
 ---
 

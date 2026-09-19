@@ -16,3 +16,13 @@ export type InquiryDTO = {
   userId: string | null;
   createdAt: string;
 };
+
+export type InquiryWithPropertyDTO = {
+  id: string;
+  message: string;
+  createdAt: string;
+  property: {
+    id: string;
+    title: string;
+  };
+};

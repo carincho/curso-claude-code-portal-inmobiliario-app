@@ -1,9 +1,14 @@
 import type { UserDTO } from "@portal-inmobiliario/shared-types";
 import { HttpError } from "@/lib/http-error";
-import type { LoginPayload, RegisterPayload } from "@/lib/auth-schema";
+import type { LoginPayload, RegisterPayload, UpdateProfilePayload } from "@/lib/auth-schema";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { createSessionToken } from "@/lib/session";
-import { createUser, findUserByEmail, findUserById } from "@/repositories/user.repository";
+import {
+  createUser,
+  findUserByEmail,
+  findUserById,
+  updateUser,
+} from "@/repositories/user.repository";
 import type { User } from "@/generated/prisma/client";
 
 const INVALID_CREDENTIALS_MESSAGE = "Credenciales inválidas";
@@ -61,5 +66,20 @@ export async function getAuthenticatedUser(userId: string): Promise<UserDTO> {
     throw new HttpError(401, "No autenticado");
   }
 
+  return toUserDTO(user);
+}
+
+export async function updateUserProfile(
+  userId: string,
+  input: UpdateProfilePayload,
+): Promise<UserDTO> {
+  const existing = await findUserByEmail(input.email);
+
+  if (existing && existing.id !== userId) {
+    throw new HttpError(409, "Ya existe una cuenta con ese email");
+  }
+
+  const passwordHash = input.password ? await hashPassword(input.password) : undefined;
+  const user = await updateUser(userId, { name: input.name, email: input.email, passwordHash });
   return toUserDTO(user);
 }

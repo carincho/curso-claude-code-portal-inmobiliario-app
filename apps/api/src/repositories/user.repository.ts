@@ -11,3 +11,10 @@ export function findUserById(id: string) {
 export function createUser(data: { name: string; email: string; passwordHash: string }) {
   return prisma.user.create({ data });
 }
+
+export function updateUser(
+  id: string,
+  data: { name: string; email: string; passwordHash?: string },
+) {
+  return prisma.user.update({ where: { id }, data });
+}
