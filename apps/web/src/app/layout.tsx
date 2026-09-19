@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { getApiUrl } from "@/lib/get-api-url";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,11 +29,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <Suspense fallback={<div className="sticky top-0 z-50 h-16 bg-header" />}>
-          <Header />
-        </Suspense>
-        <main className="flex flex-1 flex-col">{children}</main>
-        <Footer />
+        <AuthProvider apiUrl={getApiUrl()}>
+          <Suspense fallback={<div className="sticky top-0 z-50 h-16 bg-header" />}>
+            <Header />
+          </Suspense>
+          <main className="flex flex-1 flex-col">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -6,6 +6,7 @@ export async function submitInquiry(
 ): Promise<InquiryDTO> {
   const response = await fetch(`${apiUrl}/api/inquiries`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });

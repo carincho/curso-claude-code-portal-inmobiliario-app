@@ -13,5 +13,6 @@ export type InquiryDTO = {
   phone: string;
   message: string;
   propertyId: string;
+  userId: string | null;
   createdAt: string;
 };

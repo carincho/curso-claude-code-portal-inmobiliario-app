@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { cn } from "@/lib/cn";
 import { BrandIcon } from "./BrandIcon";
 import { isNavLinkActive, NAV_LINKS } from "./nav-links";
@@ -12,6 +13,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user, isLoading, logout } = useAuth();
 
   useEffect(() => {
     function handleScroll() {
@@ -65,12 +67,28 @@ export function Header() {
           </ul>
         </nav>
 
-        <Link
-          href="/login"
-          className="hidden rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text md:inline-block"
-        >
-          Ingresar
-        </Link>
+        <div className="hidden items-center gap-3 md:flex">
+          {!isLoading &&
+            (user ? (
+              <>
+                <span className="text-sm text-header-text/80">Hola, {user.name}</span>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-header-text transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text"
+                >
+                  Salir
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text"
+              >
+                Ingresar
+              </Link>
+            ))}
+        </div>
 
         <button
           type="button"
@@ -136,15 +154,31 @@ export function Header() {
               </li>
             );
           })}
-          <li>
-            <Link
-              href="/login"
-              className="block rounded-md px-3 py-2 text-base font-medium text-header-text hover:bg-white/10"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Ingresar
-            </Link>
-          </li>
+          {!isLoading &&
+            (user ? (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    void logout();
+                  }}
+                  className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-header-text hover:bg-white/10"
+                >
+                  Salir ({user.name})
+                </button>
+              </li>
+            ) : (
+              <li>
+                <Link
+                  href="/login"
+                  className="block rounded-md px-3 py-2 text-base font-medium text-header-text hover:bg-white/10"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Ingresar
+                </Link>
+              </li>
+            ))}
         </ul>
       </nav>
     </header>

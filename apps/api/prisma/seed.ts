@@ -1,6 +1,15 @@
 import "dotenv/config";
 import { prisma } from "../src/lib/prisma";
+import { hashPassword } from "../src/lib/password";
 import type { OperationType, PropertyType } from "../src/generated/prisma/enums";
+import type { Role } from "../src/generated/prisma/enums";
+
+const TEST_USER_PASSWORD = "Password123!";
+
+const TEST_USERS: { name: string; email: string; role: Role }[] = [
+  { name: "Usuario de Prueba", email: "usuario@portalinmobiliario.test", role: "USER" },
+  { name: "Administrador", email: "admin@portalinmobiliario.test", role: "ADMIN" },
+];
 
 const FEATURE_NAMES = [
   "Piscina",
@@ -297,7 +306,22 @@ function buildImageUrl(seed: string) {
   return `https://picsum.photos/seed/${seed}/1200/800`;
 }
 
+async function seedTestUsers() {
+  console.log("Creando usuarios de prueba...");
+  const passwordHash = await hashPassword(TEST_USER_PASSWORD);
+
+  for (const user of TEST_USERS) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: { name: user.name, email: user.email, role: user.role, passwordHash },
+    });
+  }
+}
+
 async function main() {
+  await seedTestUsers();
+
   console.log("Limpiando datos de propiedades existentes...");
   await prisma.propertyImage.deleteMany();
   await prisma.property.deleteMany();
