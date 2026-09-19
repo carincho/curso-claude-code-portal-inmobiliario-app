@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { ContactForm } from "@/components/properties/ContactForm";
 import { PropertyGallery } from "@/components/properties/PropertyGallery";
 import { PropertyMap } from "@/components/properties/PropertyMap";
@@ -65,10 +66,17 @@ export default async function PropertyDetailPage(props: PageProps<"/properties/[
         badgeLabel={OPERATION_TYPE_LABELS[property.operationType]}
       />
 
-      <h1 className="text-3xl font-semibold tracking-tight text-stone-900">{property.title}</h1>
-      <p className="mt-1 text-sm text-stone-600">
-        {PROPERTY_TYPE_LABELS[property.propertyType]} · {location}
-      </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-stone-900">
+            {property.title}
+          </h1>
+          <p className="mt-1 text-sm text-stone-600">
+            {PROPERTY_TYPE_LABELS[property.propertyType]} · {location}
+          </p>
+        </div>
+        <FavoriteButton propertyId={property.id} className="border border-stone-200" />
+      </div>
 
       <p className="mt-6 text-2xl font-semibold text-accent">
         {formatPrice(property.price, property.currency)}

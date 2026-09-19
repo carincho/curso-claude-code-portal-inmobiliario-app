@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { FavoritesProvider } from "@/components/favorites/FavoritesProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { getApiUrl } from "@/lib/get-api-url";
@@ -30,11 +31,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <AuthProvider apiUrl={getApiUrl()}>
-          <Suspense fallback={<div className="sticky top-0 z-50 h-16 bg-header" />}>
-            <Header />
-          </Suspense>
-          <main className="flex flex-1 flex-col">{children}</main>
-          <Footer />
+          <FavoritesProvider>
+            <Suspense fallback={<div className="sticky top-0 z-50 h-16 bg-header" />}>
+              <Header />
+            </Suspense>
+            <main className="flex flex-1 flex-col">{children}</main>
+            <Footer />
+          </FavoritesProvider>
         </AuthProvider>
       </body>
     </html>

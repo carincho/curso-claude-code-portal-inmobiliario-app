@@ -4,9 +4,43 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFavorites } from "@/components/favorites/FavoritesProvider";
 import { cn } from "@/lib/cn";
 import { BrandIcon } from "./BrandIcon";
 import { isNavLinkActive, NAV_LINKS } from "./nav-links";
+
+function FavoritesLink({ count, className }: { count: number; className?: string }) {
+  return (
+    <Link
+      href="/account"
+      aria-label={`Favoritos: ${count} ${count === 1 ? "propiedad" : "propiedades"}`}
+      className={cn(
+        "relative inline-flex h-9 w-9 items-center justify-center rounded-full text-header-text/80 transition-colors hover:text-header-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text",
+        className,
+      )}
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.8}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 20.25c-.3 0-.6-.09-.85-.28C7.29 17.1 3.75 14 3.75 9.94 3.75 7.2 5.93 5 8.63 5c1.4 0 2.74.63 3.62 1.68A4.83 4.83 0 0 1 15.87 5c2.7 0 4.88 2.2 4.88 4.94 0 4.06-3.54 7.16-7.4 10.03-.25.19-.55.28-.85.28Z"
+        />
+      </svg>
+      {count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold leading-none text-accent-foreground">
+          {count}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +48,7 @@ export function Header() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user, isLoading, logout } = useAuth();
+  const { favoriteIds } = useFavorites();
 
   useEffect(() => {
     function handleScroll() {
@@ -71,6 +106,7 @@ export function Header() {
           {!isLoading &&
             (user ? (
               <>
+                <FavoritesLink count={favoriteIds.size} />
                 <Link
                   href="/account"
                   className="text-sm text-header-text/80 hover:text-header-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text"
@@ -169,6 +205,15 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Mi cuenta ({user.name})
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/account"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-header-text hover:bg-white/10"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Favoritos ({favoriteIds.size})
                   </Link>
                 </li>
                 <li>

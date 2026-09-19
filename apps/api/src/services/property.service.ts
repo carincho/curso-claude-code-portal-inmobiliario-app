@@ -12,7 +12,7 @@ import type {
   PropertyLocations,
 } from "@portal-inmobiliario/shared-types";
 
-function toListItem(property: PublishedProperty): PropertyListItem {
+export function toListItem(property: PublishedProperty): PropertyListItem {
   const mainImage = property.images[0] ?? null;
 
   return {

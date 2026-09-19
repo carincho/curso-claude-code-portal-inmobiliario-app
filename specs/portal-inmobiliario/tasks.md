@@ -125,7 +125,7 @@
   - Mostrar información básica.
   - Preparar secciones de propiedades interesadas y consultadas.
 
-- [ ] **Paso 20 — Favoritos**
+- [x] **Paso 20 — Favoritos**
   - Listar.
   - Agregar.
   - Eliminar.

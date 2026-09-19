@@ -1,7 +1,7 @@
 import type { PropertyFilters } from "@/lib/property-filters-schema";
 import { prisma } from "@/lib/prisma";
 
-const publicPropertyInclude = {
+export const publicPropertyInclude = {
   images: { orderBy: { position: "asc" as const } },
   features: true,
 };

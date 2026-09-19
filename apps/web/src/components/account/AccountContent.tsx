@@ -1,13 +1,61 @@
 "use client";
 
-import type { InquiryWithPropertyDTO } from "@portal-inmobiliario/shared-types";
+import type { InquiryWithPropertyDTO, PropertyListItem } from "@portal-inmobiliario/shared-types";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFavorites } from "@/components/favorites/FavoritesProvider";
+import { PropertyGrid } from "@/components/properties/PropertyGrid";
 import { formatDate } from "@/lib/format";
+import { fetchFavorites } from "@/lib/favorites-client";
 import { fetchMyInquiries } from "@/lib/inquiries-client";
 
 const ROLE_LABELS = { USER: "Usuario", ADMIN: "Administrador" } as const;
+
+function FavoritesSection({ apiUrl }: { apiUrl: string }) {
+  const { favoriteIds, isLoading: favoritesLoading } = useFavorites();
+  const [properties, setProperties] = useState<PropertyListItem[] | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchFavorites(apiUrl)
+      .then((data) => {
+        if (!cancelled) {
+          setProperties(data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [apiUrl]);
+
+  if (error) {
+    return <p className="mt-3 text-sm text-red-600">No se pudieron cargar tus favoritos.</p>;
+  }
+
+  if (properties === null || favoritesLoading) {
+    return <p className="mt-3 text-sm text-stone-500">Cargando…</p>;
+  }
+
+  const visibleProperties = properties.filter((property) => favoriteIds.has(property.id));
+
+  return (
+    <div className="mt-3">
+      <PropertyGrid
+        properties={visibleProperties}
+        emptyMessage="Todavía no has guardado ninguna propiedad como favorita."
+      />
+    </div>
+  );
+}
 
 function InquiriesSection({ apiUrl }: { apiUrl: string }) {
   const [inquiries, setInquiries] = useState<InquiryWithPropertyDTO[] | null>(null);
@@ -114,9 +162,7 @@ export function AccountContent() {
 
       <section>
         <h2 className="text-lg font-semibold text-stone-900">Propiedades interesadas</h2>
-        <div className="mt-3 rounded-lg border border-dashed border-card-border bg-card p-6 text-center text-sm text-stone-600">
-          Próximamente podrás guardar propiedades como favoritas y verlas aquí.
-        </div>
+        <FavoritesSection apiUrl={apiUrl} />
       </section>
 
       <section>
