@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { contactFormSchema, type ContactFormValues } from "@/lib/contact-form-schema";
 import { submitInquiry } from "@/lib/inquiries-client";
 import { sendToWeb3Forms } from "@/lib/web3forms-client";
@@ -23,6 +24,7 @@ export function ContactForm({
   propertyId: string;
   propertyTitle: string;
 }) {
+  const { user } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
   const {
     register,
@@ -33,6 +35,12 @@ export function ContactForm({
     resolver: zodResolver(contactFormSchema),
     defaultValues: { message: "Quiero detalles sobre esta propiedad" },
   });
+
+  useEffect(() => {
+    if (user) {
+      reset((current) => ({ ...current, name: user.name, email: user.email }));
+    }
+  }, [user, reset]);
 
   async function onSubmit(values: ContactFormValues) {
     setStatus("sending");

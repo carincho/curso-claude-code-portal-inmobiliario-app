@@ -132,7 +132,7 @@
   - Evitar duplicados.
   - Integrar en interfaz.
 
-- [ ] **Paso 21 — Persistir consultas**
+- [x] **Paso 21 — Persistir consultas**
   - Crear consulta mediante REST.
   - Persistir en PostgreSQL.
   - Asociar propiedad.
