@@ -2,10 +2,50 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { BrandIcon } from "@/components/layout/BrandIcon";
 import { cn } from "@/lib/cn";
+
+type AdminTheme = "light" | "dark";
+
+const ADMIN_THEME_STORAGE_KEY = "admin-theme";
+const adminThemeListeners = new Set<() => void>();
+
+function readAdminTheme(): AdminTheme {
+  try {
+    return window.localStorage.getItem(ADMIN_THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
+function subscribeAdminTheme(listener: () => void) {
+  adminThemeListeners.add(listener);
+  return () => adminThemeListeners.delete(listener);
+}
+
+function writeAdminTheme(theme: AdminTheme) {
+  try {
+    window.localStorage.setItem(ADMIN_THEME_STORAGE_KEY, theme);
+  } catch {
+    // localStorage no disponible (modo privado, etc.): el cambio solo dura la sesión actual.
+  }
+  adminThemeListeners.forEach((listener) => listener());
+}
+
+// El servidor no conoce la preferencia guardada en localStorage, así que la primera
+// hidratación siempre asume tema claro; useSyncExternalStore corrige al valor real
+// del cliente justo después, sin generar un mismatch de hidratación.
+function useAdminTheme() {
+  const theme = useSyncExternalStore(subscribeAdminTheme, readAdminTheme, () => "light" as const);
+
+  function toggleTheme() {
+    writeAdminTheme(theme === "light" ? "dark" : "light");
+  }
+
+  return { theme, toggleTheme };
+}
 
 type NavItem = {
   href: string;
@@ -70,6 +110,22 @@ function MenuIcon() {
   );
 }
 
+function SunIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25M12 18.75V21M4.219 4.219l1.591 1.591M18.19 18.19l1.591 1.591M3 12h2.25M18.75 12H21M4.219 19.781l1.591-1.591M18.19 5.81l1.591-1.591M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+    </svg>
+  );
+}
+
 function LogoutIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8}>
@@ -98,9 +154,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useAdminTheme();
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background" data-admin-theme={theme}>
       {mobileOpen && (
         <button
           type="button"
@@ -124,6 +181,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
               Panel de administración
             </span>
           )}
+        </div>
+
+        <div className="border-b border-white/10 p-3">
+          <button
+            type="button"
+            onClick={() => setCollapsed((value) => !value)}
+            aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
+            className="hidden w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-footer-text-muted transition-colors hover:bg-white/10 hover:text-footer-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:flex"
+          >
+            <ChevronIcon collapsed={collapsed} />
+            {!collapsed && "Colapsar menú"}
+          </button>
         </div>
 
         <nav aria-label="Navegación de administración" className="flex-1 overflow-y-auto py-4">
@@ -179,18 +248,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
             })}
           </ul>
         </nav>
-
-        <div className="border-t border-white/10 p-3">
-          <button
-            type="button"
-            onClick={() => setCollapsed((value) => !value)}
-            aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
-            className="hidden w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-footer-text-muted transition-colors hover:bg-white/10 hover:text-footer-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:flex"
-          >
-            <ChevronIcon collapsed={collapsed} />
-            {!collapsed && "Colapsar menú"}
-          </button>
-        </div>
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col">
@@ -199,24 +256,34 @@ export function AdminShell({ children }: { children: ReactNode }) {
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="Abrir menú de administración"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:hidden"
           >
             <MenuIcon />
           </button>
 
           <Link
             href="/"
-            className="text-sm text-stone-500 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="text-sm text-muted-foreground hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             ← Ver sitio público
           </Link>
 
           <div className="ml-auto flex items-center gap-3">
-            <span className="hidden text-sm text-stone-600 sm:inline">{user?.name}</span>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-pressed={theme === "dark"}
+              aria-label={theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
+              title={theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+            <span className="hidden text-sm text-muted-foreground sm:inline">{user?.name}</span>
             <button
               type="button"
               onClick={() => logout()}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-700 transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <LogoutIcon />
               Salir

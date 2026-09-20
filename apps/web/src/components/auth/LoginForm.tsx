@@ -30,7 +30,7 @@ export function LoginForm() {
     try {
       const user = await loginUser(apiUrl, values);
       setUser(user);
-      router.push("/");
+      router.push(user.role === "ADMIN" ? "/admin" : "/");
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "No se pudo iniciar sesión");
     }

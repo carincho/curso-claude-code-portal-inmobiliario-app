@@ -21,12 +21,28 @@
   /* Tarjetas: blanco puro para que resalten sobre el fondo cálido */
   --card-bg: #ffffff;
   --card-border: #e7e5e4;
+  --muted-foreground: #78716c;
 
   /* Acento cálido (ámbar/terracota) para precios, badges y botones */
   --accent: #c2410c;
   --accent-hover: #9a3412;
   --accent-foreground: #ffffff;
   --accent-soft: #fff7ed;
+}
+
+/*
+ * Tema oscuro exclusivo del panel de administración (`/admin`), activado por
+ * un toggle propio del dashboard. El sitio público mantiene un único tema
+ * claro: este bloque solo aplica dentro del contenedor con
+ * data-admin-theme="dark" que renderiza AdminShell.
+ */
+[data-admin-theme="dark"] {
+  color-scheme: dark;
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  --muted-foreground: #94a3b8;
 }
 
 @theme inline {
@@ -39,6 +55,7 @@
   --color-footer-text-muted: var(--footer-text-muted);
   --color-card: var(--card-bg);
   --color-card-border: var(--card-border);
+  --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
