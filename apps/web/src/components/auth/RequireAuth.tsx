@@ -18,7 +18,7 @@ export function RequireAuth({ role, children }: { role?: Role; children: ReactNo
     if (!user) {
       router.replace("/login");
     } else if (role && user.role !== role) {
-      router.replace("/");
+      router.replace(user.role === "ADMIN" ? "/admin" : "/");
     }
   }, [isLoading, user, role, router]);
 

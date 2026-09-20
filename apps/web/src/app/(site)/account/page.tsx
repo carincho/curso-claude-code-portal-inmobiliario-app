@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function AccountPage() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-      <RequireAuth>
+      <RequireAuth role="USER">
         <AccountContent />
       </RequireAuth>
     </div>

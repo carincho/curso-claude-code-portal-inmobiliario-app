@@ -467,7 +467,13 @@ ADMIN puede:
 - buscar;
 - consultar;
 - activar/desactivar;
-- modificar rol cuando corresponda.
+- modificar rol cuando corresponda;
+- editar sus propios datos (incluida su contraseña) desde esta misma sección, ya que no tiene
+  acceso a `/account`.
+
+Un ADMIN no puede eliminar ni desactivar su propia cuenta, ni cambiar su propio rol a `USER`,
+para evitar quedarse sin administradores. Esta restricción debe aplicarse en backend, no solo
+ocultando el control en la interfaz.
 
 La autorización siempre debe comprobarse en backend.
 

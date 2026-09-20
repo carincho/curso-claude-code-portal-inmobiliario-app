@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function EditAccountPage() {
   return (
     <div className="mx-auto w-full max-w-md px-4 py-10 sm:px-6 lg:px-8">
-      <RequireAuth>
+      <RequireAuth role="USER">
         <h1 className="text-2xl font-semibold text-stone-900">Editar cuenta</h1>
         <p className="mt-2 text-sm text-stone-600">Actualiza tu nombre y email.</p>
         <div className="mt-8">
