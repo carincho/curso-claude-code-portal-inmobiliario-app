@@ -29,6 +29,7 @@ export type PropertyListItem = {
   commune: string;
   city: string;
   region: string;
+  isPublished: boolean;
   isFeatured: boolean;
   mainImage: PropertyImageDTO | null;
   createdAt: string;
@@ -49,4 +50,24 @@ export type PropertyLocations = {
   communes: string[];
   cities: string[];
   regions: string[];
+};
+
+export type PropertyInput = {
+  title: string;
+  description: string;
+  operationType: OperationType;
+  propertyType: PropertyType;
+  price: number;
+  usableArea?: number | null;
+  totalArea?: number | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  parkingSpaces?: number | null;
+  age?: number | null;
+  address: string;
+  commune: string;
+  city: string;
+  region: string;
+  isPublished?: boolean;
+  isFeatured?: boolean;
 };

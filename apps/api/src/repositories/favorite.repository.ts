@@ -3,7 +3,7 @@ import { publicPropertyInclude } from "@/repositories/property.repository";
 
 export function findFavoritesByUserId(userId: string) {
   return prisma.favorite.findMany({
-    where: { userId },
+    where: { userId, property: { deletedAt: null } },
     include: { property: { include: publicPropertyInclude } },
     orderBy: { createdAt: "desc" },
   });

@@ -69,6 +69,7 @@ model Property {
   region        String
   isPublished   Boolean       @default(false)
   isFeatured    Boolean       @default(false)
+  deletedAt     DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -84,6 +85,7 @@ model Property {
   @@index([region])
   @@index([price])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("properties")
 }
 

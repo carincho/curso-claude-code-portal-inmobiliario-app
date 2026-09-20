@@ -1,9 +1,15 @@
+import type { PropertyInputPayload } from "@/lib/admin-property-schema";
 import type { PropertyFilters } from "@/lib/property-filters-schema";
 import { HttpError } from "@/lib/http-error";
 import {
+  createProperty,
+  deleteProperty,
+  findAllProperties,
   findDistinctPublishedLocations,
+  findPropertyById,
   findPublishedProperties,
   findPublishedPropertyById,
+  updateProperty,
   type PublishedProperty,
 } from "@/repositories/property.repository";
 import type {
@@ -28,6 +34,7 @@ export function toListItem(property: PublishedProperty): PropertyListItem {
     commune: property.commune,
     city: property.city,
     region: property.region,
+    isPublished: property.isPublished,
     isFeatured: property.isFeatured,
     mainImage: mainImage
       ? {
@@ -41,7 +48,7 @@ export function toListItem(property: PublishedProperty): PropertyListItem {
   };
 }
 
-function toDetail(property: PublishedProperty): PropertyDetail {
+export function toDetail(property: PublishedProperty): PropertyDetail {
   return {
     ...toListItem(property),
     description: property.description,
@@ -82,4 +89,49 @@ export async function getPublicProperty(id: string): Promise<PropertyDetail> {
 
 export async function getPropertyLocations(): Promise<PropertyLocations> {
   return findDistinctPublishedLocations();
+}
+
+export async function listAdminProperties(
+  filters: PropertyFilters = {},
+): Promise<PropertyListItem[]> {
+  const properties = await findAllProperties(filters);
+  return properties.map(toListItem);
+}
+
+export async function getAdminProperty(id: string): Promise<PropertyDetail> {
+  const property = await findPropertyById(id);
+
+  if (!property) {
+    throw new HttpError(404, "Propiedad no encontrada");
+  }
+
+  return toDetail(property);
+}
+
+export async function createAdminProperty(
+  input: PropertyInputPayload,
+): Promise<PropertyDetail> {
+  const property = await createProperty(input);
+  return toDetail(property);
+}
+
+export async function updateAdminProperty(
+  id: string,
+  input: PropertyInputPayload,
+): Promise<PropertyDetail> {
+  const property = await updateProperty(id, input);
+
+  if (!property) {
+    throw new HttpError(404, "Propiedad no encontrada");
+  }
+
+  return toDetail(property);
+}
+
+export async function deleteAdminProperty(id: string): Promise<void> {
+  const deleted = await deleteProperty(id);
+
+  if (!deleted) {
+    throw new HttpError(404, "Propiedad no encontrada");
+  }
 }

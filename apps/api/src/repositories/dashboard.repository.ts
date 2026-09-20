@@ -9,10 +9,10 @@ export async function getDashboardCounts() {
     totalUsers,
     totalInquiries,
   ] = await Promise.all([
-    prisma.property.count(),
-    prisma.property.count({ where: { isPublished: true } }),
-    prisma.property.count({ where: { operationType: "SALE" } }),
-    prisma.property.count({ where: { operationType: "RENT" } }),
+    prisma.property.count({ where: { deletedAt: null } }),
+    prisma.property.count({ where: { deletedAt: null, isPublished: true } }),
+    prisma.property.count({ where: { deletedAt: null, operationType: "SALE" } }),
+    prisma.property.count({ where: { deletedAt: null, operationType: "RENT" } }),
     prisma.user.count(),
     prisma.inquiry.count(),
   ]);

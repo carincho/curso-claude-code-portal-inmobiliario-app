@@ -6,7 +6,7 @@ const toArray = <T extends z.ZodType>(schema: T) =>
     .transform((value) => (Array.isArray(value) ? value : [value]))
     .optional();
 
-const propertyTypeEnum = z.enum([
+export const propertyTypeEnum = z.enum([
   "HOUSE",
   "APARTMENT",
   "LAND",
@@ -14,6 +14,8 @@ const propertyTypeEnum = z.enum([
   "COMMERCIAL",
   "OTHER",
 ]);
+
+export const operationTypeEnum = z.enum(["SALE", "RENT"]);
 
 const nonEmptyString = z.string().trim().min(1);
 
@@ -27,7 +29,7 @@ export const PROPERTY_SORT_OPTIONS = [
 
 export const propertyFiltersSchema = z.object({
   search: z.string().trim().min(1).optional(),
-  operation: z.enum(["SALE", "RENT"]).optional(),
+  operation: operationTypeEnum.optional(),
   type: toArray(propertyTypeEnum),
   minPrice: z.coerce.number().nonnegative().optional(),
   maxPrice: z.coerce.number().nonnegative().optional(),
