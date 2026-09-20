@@ -1,3 +1,5 @@
+import type { PropertyImageDTO } from "./property";
+
 export type CreateInquiryInput = {
   name: string;
   email: string;
@@ -17,12 +19,22 @@ export type InquiryDTO = {
   createdAt: string;
 };
 
-export type InquiryWithPropertyDTO = {
+export type InquiryRecordDTO = {
   id: string;
+  email: string;
   message: string;
   createdAt: string;
   property: {
     id: string;
     title: string;
+    mainImage: PropertyImageDTO | null;
   };
+};
+
+export type PaginatedInquiries = {
+  items: InquiryRecordDTO[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 };
