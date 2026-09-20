@@ -106,6 +106,14 @@ export function Header() {
           {!isLoading &&
             (user ? (
               <>
+                {user.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="text-sm text-header-text/80 hover:text-header-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-text"
+                  >
+                    Admin
+                  </Link>
+                )}
                 <FavoritesLink count={favoriteIds.size} />
                 <Link
                   href="/account"
@@ -198,6 +206,17 @@ export function Header() {
           {!isLoading &&
             (user ? (
               <>
+                {user.role === "ADMIN" && (
+                  <li>
+                    <Link
+                      href="/admin"
+                      className="block rounded-md px-3 py-2 text-base font-medium text-header-text hover:bg-white/10"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Panel de administración
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <Link
                     href="/account"
