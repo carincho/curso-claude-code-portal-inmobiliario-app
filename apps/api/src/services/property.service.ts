@@ -1,5 +1,5 @@
 import type { PropertyInputPayload } from "@/lib/admin-property-schema";
-import type { PropertyFilters } from "@/lib/property-filters-schema";
+import type { AdminPropertyFilters, PropertyFilters } from "@/lib/property-filters-schema";
 import { HttpError } from "@/lib/http-error";
 import {
   createProperty,
@@ -92,7 +92,7 @@ export async function getPropertyLocations(): Promise<PropertyLocations> {
 }
 
 export async function listAdminProperties(
-  filters: PropertyFilters = {},
+  filters: AdminPropertyFilters = {},
 ): Promise<PropertyListItem[]> {
   const properties = await findAllProperties(filters);
   return properties.map(toListItem);

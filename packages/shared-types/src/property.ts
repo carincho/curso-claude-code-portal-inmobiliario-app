@@ -70,4 +70,5 @@ export type PropertyInput = {
   region: string;
   isPublished?: boolean;
   isFeatured?: boolean;
+  features?: string[];
 };

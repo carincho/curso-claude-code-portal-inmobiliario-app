@@ -43,3 +43,13 @@ export const propertyFiltersSchema = z.object({
 });
 
 export type PropertyFilters = z.infer<typeof propertyFiltersSchema>;
+
+export const propertyStatusEnum = z.enum(["PUBLISHED", "DRAFT"]);
+
+export const adminPropertyFiltersSchema = propertyFiltersSchema.extend({
+  status: propertyStatusEnum.optional(),
+  createdFrom: z.coerce.date().optional(),
+  createdTo: z.coerce.date().optional(),
+});
+
+export type AdminPropertyFilters = z.infer<typeof adminPropertyFiltersSchema>;

@@ -22,6 +22,7 @@ export const propertyInputSchema = z.object({
   region: z.string().trim().min(1),
   isPublished: z.boolean().optional().default(false),
   isFeatured: z.boolean().optional().default(false),
+  features: z.array(z.string().trim().min(1)).max(30).optional().default([]),
 });
 
 export type PropertyInputPayload = z.infer<typeof propertyInputSchema>;

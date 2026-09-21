@@ -136,7 +136,7 @@ function LogoutIcon() {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: <DashboardIcon />, enabled: true },
-  { href: "/admin/properties", label: "Propiedades", icon: <BuildingIcon />, enabled: false },
+  { href: "/admin/properties", label: "Propiedades", icon: <BuildingIcon />, enabled: true },
   { href: "/admin/users", label: "Usuarios", icon: <UsersIcon />, enabled: false },
   { href: "/admin/inquiries", label: "Consultas", icon: <MailIcon />, enabled: false },
 ];
@@ -250,7 +250,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </nav>
       </aside>
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-card-border bg-card px-4 sm:px-6">
           <button
             type="button"

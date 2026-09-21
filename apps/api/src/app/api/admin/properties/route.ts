@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/authorize";
 import { corsHeaders, corsPreflightResponse } from "@/lib/cors";
 import { HttpError, toErrorResponse } from "@/lib/http-error";
 import { propertyInputSchema } from "@/lib/admin-property-schema";
-import { propertyFiltersSchema } from "@/lib/property-filters-schema";
+import { adminPropertyFiltersSchema } from "@/lib/property-filters-schema";
 import { parseSearchParams } from "@/lib/search-params";
 import { createAdminProperty, listAdminProperties } from "@/services/property.service";
 
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     await requireRole(request, "ADMIN");
 
     const { searchParams } = new URL(request.url);
-    const parsed = propertyFiltersSchema.safeParse(parseSearchParams(searchParams));
+    const parsed = adminPropertyFiltersSchema.safeParse(parseSearchParams(searchParams));
 
     if (!parsed.success) {
       throw new HttpError(400, "Parámetros de filtro inválidos");
