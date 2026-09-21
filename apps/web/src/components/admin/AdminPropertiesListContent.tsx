@@ -12,7 +12,7 @@ import {
   type PropertiesFilterDraft,
 } from "@/components/admin/AdminPropertiesFilterPanel";
 import { deleteAdminProperty, fetchAdminProperties } from "@/lib/admin-properties-client";
-import { formatPrice } from "@/lib/format";
+import { formatDate, formatPrice } from "@/lib/format";
 import { OPERATION_TYPE_LABELS, PROPERTY_TYPE_LABELS } from "@/lib/property-labels";
 
 const inputClassName =
@@ -209,6 +209,9 @@ export function AdminPropertiesListContent() {
                     </p>
                     <p className="mt-1 text-sm font-semibold text-accent">
                       {formatPrice(property.price, property.currency)}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Publicada el {formatDate(property.createdAt)}
                     </p>
                   </div>
 
