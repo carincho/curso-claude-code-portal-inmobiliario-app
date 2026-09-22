@@ -19,6 +19,7 @@ function toUserDTO(user: User): UserDTO {
     name: user.name,
     email: user.email,
     role: user.role,
+    isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
   };
 }

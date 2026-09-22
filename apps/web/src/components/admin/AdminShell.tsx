@@ -147,7 +147,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: <DashboardIcon />, enabled: true },
   { href: "/admin/properties", label: "Propiedades", icon: <BuildingIcon />, enabled: true },
   { href: "/admin/features", label: "Características", icon: <TagIcon />, enabled: true },
-  { href: "/admin/users", label: "Usuarios", icon: <UsersIcon />, enabled: false },
+  { href: "/admin/users", label: "Usuarios", icon: <UsersIcon />, enabled: true },
   { href: "/admin/inquiries", label: "Consultas", icon: <MailIcon />, enabled: false },
 ];
 

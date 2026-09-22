@@ -5,6 +5,7 @@ export type UserDTO = {
   name: string;
   email: string;
   role: Role;
+  isActive: boolean;
   createdAt: string;
 };
 

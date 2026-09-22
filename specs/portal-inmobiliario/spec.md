@@ -466,6 +466,7 @@ ADMIN puede:
 - listar;
 - buscar;
 - consultar;
+- crear nuevas cuentas (USER o ADMIN);
 - activar/desactivar;
 - modificar rol cuando corresponda;
 - editar sus propios datos (incluida su contraseña) desde esta misma sección, ya que no tiene

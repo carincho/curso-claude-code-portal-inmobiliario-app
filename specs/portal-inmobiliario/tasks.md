@@ -189,9 +189,10 @@
   - Modelo flexible.
   - Permitir nuevas características sin modificar columnas de Property.
 
-- [ ] **Paso 29 — Usuarios**
+- [x] **Paso 29 — Usuarios**
   - Crear `/admin/users`.
   - Listar y buscar.
+  - Dar de alta nuevas cuentas (USER o ADMIN).
   - Activar/desactivar.
   - Modificar rol cuando corresponda.
 
