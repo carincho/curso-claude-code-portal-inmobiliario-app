@@ -16,6 +16,12 @@ export type PropertyFeatureDTO = {
   name: string;
 };
 
+export type FeatureDTO = {
+  id: string;
+  name: string;
+  propertiesCount: number;
+};
+
 export type PropertyListItem = {
   id: string;
   title: string;

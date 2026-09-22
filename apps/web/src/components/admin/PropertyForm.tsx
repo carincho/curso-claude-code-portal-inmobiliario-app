@@ -7,12 +7,20 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { FeaturesInput } from "@/components/admin/FeaturesInput";
+import { PropertyImagesManager, type ManagedImage } from "@/components/admin/PropertyImagesManager";
 import {
   createAdminProperty,
   fetchAdminProperty,
   updateAdminProperty,
 } from "@/lib/admin-properties-client";
 import { fetchFeatures } from "@/lib/admin-features-client";
+import {
+  attachPropertyImage,
+  deletePropertyImage,
+  reorderPropertyImages,
+  setMainPropertyImage,
+  type UploadedImage,
+} from "@/lib/admin-images-client";
 import { OPERATION_TYPE_LABELS, PROPERTY_TYPE_LABELS } from "@/lib/property-labels";
 import {
   numberToFormString,
@@ -59,11 +67,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+type PendingImage = ManagedImage & { publicId: string };
+
 export function PropertyForm(props: PropertyFormProps) {
   const router = useRouter();
   const { apiUrl } = useAuth();
   const [features, setFeatures] = useState<string[]>([]);
   const [featureSuggestions, setFeatureSuggestions] = useState<string[]>([]);
+  const [images, setImages] = useState<PendingImage[]>([]);
   const [loadError, setLoadError] = useState(false);
   const [isLoading, setIsLoading] = useState(props.mode === "edit");
   const [serverError, setServerError] = useState<string | null>(null);
@@ -130,6 +141,14 @@ export function PropertyForm(props: PropertyFormProps) {
           isFeatured: property.isFeatured,
         });
         setFeatures(property.features.map((feature) => feature.name));
+        setImages(
+          property.images.map((image) => ({
+            id: image.id,
+            url: image.url,
+            isMain: image.isMain,
+            publicId: "",
+          })),
+        );
       })
       .catch(() => {
         if (!cancelled) {
@@ -147,6 +166,75 @@ export function PropertyForm(props: PropertyFormProps) {
     };
   }, [apiUrl, editingPropertyId, reset]);
 
+  async function handleAddImage(uploaded: UploadedImage) {
+    if (editingPropertyId !== null) {
+      const created = await attachPropertyImage(apiUrl, editingPropertyId, uploaded);
+      setImages((prev) => [
+        ...prev,
+        { id: created.id, url: created.url, isMain: created.isMain, publicId: "" },
+      ]);
+      return;
+    }
+
+    const tempId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setImages((prev) => [
+      ...prev,
+      { id: tempId, url: uploaded.url, isMain: prev.length === 0, publicId: uploaded.publicId },
+    ]);
+  }
+
+  async function handleRemoveImage(imageId: string) {
+    if (editingPropertyId !== null) {
+      await deletePropertyImage(apiUrl, editingPropertyId, imageId);
+    }
+
+    setImages((prev) => {
+      const next = prev.filter((image) => image.id !== imageId);
+      if (next.length > 0 && !next.some((image) => image.isMain)) {
+        next[0] = { ...next[0], isMain: true };
+      }
+      return next;
+    });
+  }
+
+  async function handleSetMainImage(imageId: string) {
+    if (editingPropertyId !== null) {
+      await setMainPropertyImage(apiUrl, editingPropertyId, imageId);
+    }
+
+    setImages((prev) => prev.map((image) => ({ ...image, isMain: image.id === imageId })));
+  }
+
+  async function handleReorderImages(nextOrderIds: string[]) {
+    const next = nextOrderIds
+      .map((id) => images.find((image) => image.id === id))
+      .filter((image): image is PendingImage => Boolean(image));
+    setImages(next);
+
+    if (editingPropertyId !== null) {
+      await reorderPropertyImages(apiUrl, editingPropertyId, nextOrderIds);
+    }
+  }
+
+  async function attachPendingImages(propertyId: string) {
+    let mainImageId: string | null = null;
+
+    for (const image of images) {
+      const created = await attachPropertyImage(apiUrl, propertyId, {
+        url: image.url,
+        publicId: image.publicId,
+      });
+
+      if (image.isMain) {
+        mainImageId = created.id;
+      }
+    }
+
+    if (mainImageId) {
+      await setMainPropertyImage(apiUrl, propertyId, mainImageId);
+    }
+  }
+
   async function onSubmit(values: PropertyFormValues) {
     setServerError(null);
 
@@ -156,7 +244,8 @@ export function PropertyForm(props: PropertyFormProps) {
       if (props.mode === "edit") {
         await updateAdminProperty(apiUrl, props.propertyId, payload);
       } else {
-        await createAdminProperty(apiUrl, payload);
+        const created = await createAdminProperty(apiUrl, payload);
+        await attachPendingImages(created.id);
       }
 
       router.push("/admin/properties");
@@ -385,6 +474,20 @@ export function PropertyForm(props: PropertyFormProps) {
           {errors.region && <p className={errorClassName}>{errors.region.message}</p>}
         </div>
       </Section>
+
+      <section className="rounded-lg border border-card-border bg-card p-6">
+        <h2 className="text-sm font-semibold text-foreground">Imágenes</h2>
+        <div className="mt-4">
+          <PropertyImagesManager
+            apiUrl={apiUrl}
+            images={images}
+            onAdd={handleAddImage}
+            onRemove={handleRemoveImage}
+            onSetMain={handleSetMainImage}
+            onReorder={handleReorderImages}
+          />
+        </div>
+      </section>
 
       <section className="rounded-lg border border-card-border bg-card p-6">
         <h2 className="text-sm font-semibold text-foreground">Características</h2>

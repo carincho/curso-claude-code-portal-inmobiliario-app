@@ -19,7 +19,7 @@ import type {
 } from "@portal-inmobiliario/shared-types";
 
 export function toListItem(property: PublishedProperty): PropertyListItem {
-  const mainImage = property.images[0] ?? null;
+  const mainImage = property.images.find((image) => image.isMain) ?? property.images[0] ?? null;
 
   return {
     id: property.id,
