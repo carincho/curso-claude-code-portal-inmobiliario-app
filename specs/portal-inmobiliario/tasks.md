@@ -196,7 +196,7 @@
   - Activar/desactivar.
   - Modificar rol cuando corresponda.
 
-- [ ] **Paso 30 — Consultas**
+- [x] **Paso 30 — Consultas**
   - Crear `/admin/inquiries`.
   - Mostrar propiedad, usuario, contacto, mensaje y fecha.
   - Enlazar propiedad asociada.
@@ -214,6 +214,8 @@
   - Evitar imágenes sobredimensionadas.
   - Revisar solicitudes duplicadas.
   - Revisar consultas PostgreSQL.
+  - [x] Búsqueda insensible a acentos/ñ (extensión `unaccent`) en propiedades, usuarios y
+    consultas del admin, y en el buscador público.
 
 - [ ] **Paso 33 — Responsive y accesibilidad**
   - Desktop.

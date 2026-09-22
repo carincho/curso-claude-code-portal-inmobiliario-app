@@ -1,7 +1,12 @@
-import type { InquiryDTO, PaginatedInquiries } from "@portal-inmobiliario/shared-types";
+import type {
+  AdminInquiryDTO,
+  InquiryDTO,
+  PaginatedInquiries,
+} from "@portal-inmobiliario/shared-types";
 import { HttpError } from "@/lib/http-error";
 import {
   INQUIRY_PAGE_SIZE,
+  type AdminInquiryFilters,
   type CreateInquiryPayload,
   type InquiryListQuery,
 } from "@/lib/inquiry-schema";
@@ -9,6 +14,7 @@ import {
   countInquiriesByUserId,
   createInquiry,
   deleteInquiryByIdForUser,
+  findAllInquiries,
   findInquiriesByUserId,
 } from "@/repositories/inquiry.repository";
 import { findPublishedPropertyById } from "@/repositories/property.repository";
@@ -78,4 +84,34 @@ export async function deleteUserInquiry(userId: string, inquiryId: string): Prom
   if (!deleted) {
     throw new HttpError(404, "Consulta no encontrada");
   }
+}
+
+export async function listAdminInquiries(
+  filters: AdminInquiryFilters,
+): Promise<AdminInquiryDTO[]> {
+  const inquiries = await findAllInquiries(filters.search);
+
+  return inquiries.map((inquiry) => ({
+    id: inquiry.id,
+    name: inquiry.name,
+    email: inquiry.email,
+    phone: inquiry.phone,
+    message: inquiry.message,
+    createdAt: inquiry.createdAt.toISOString(),
+    property: {
+      id: inquiry.property.id,
+      title: inquiry.property.title,
+      mainImage: inquiry.property.images[0]
+        ? {
+            id: inquiry.property.images[0].id,
+            url: inquiry.property.images[0].url,
+            position: inquiry.property.images[0].position,
+            isMain: inquiry.property.images[0].isMain,
+          }
+        : null,
+    },
+    user: inquiry.user
+      ? { id: inquiry.user.id, name: inquiry.user.name, email: inquiry.user.email }
+      : null,
+  }));
 }

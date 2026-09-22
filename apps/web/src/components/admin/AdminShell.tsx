@@ -148,7 +148,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/properties", label: "Propiedades", icon: <BuildingIcon />, enabled: true },
   { href: "/admin/features", label: "Características", icon: <TagIcon />, enabled: true },
   { href: "/admin/users", label: "Usuarios", icon: <UsersIcon />, enabled: true },
-  { href: "/admin/inquiries", label: "Consultas", icon: <MailIcon />, enabled: false },
+  { href: "/admin/inquiries", label: "Consultas", icon: <MailIcon />, enabled: true },
 ];
 
 function isActivePath(href: string, pathname: string | null) {
@@ -179,26 +179,26 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col bg-footer text-footer-text transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0 md:self-start",
+          "fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-text transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0 md:self-start",
           mobileOpen && "translate-x-0",
           collapsed && "md:w-[72px]",
         )}
       >
-        <div className="flex h-16 items-center gap-2.5 border-b border-white/10 px-4">
+        <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border px-4">
           <BrandIcon />
           {!collapsed && (
-            <span className="truncate text-sm font-semibold tracking-tight text-white">
+            <span className="truncate text-sm font-semibold tracking-tight text-sidebar-text">
               Panel de administración
             </span>
           )}
         </div>
 
-        <div className="border-b border-white/10 p-3">
+        <div className="border-b border-sidebar-border p-3">
           <button
             type="button"
             onClick={() => setCollapsed((value) => !value)}
             aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
-            className="hidden w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-footer-text-muted transition-colors hover:bg-white/10 hover:text-footer-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:flex"
+            className="hidden w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-text-muted transition-colors hover:bg-sidebar-hover hover:text-sidebar-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:flex"
           >
             <ChevronIcon collapsed={collapsed} />
             {!collapsed && "Colapsar menú"}
@@ -215,7 +215,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                       aria-disabled="true"
                       title="Próximamente"
                       className={cn(
-                        "flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-footer-text-muted/60",
+                        "flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-text-muted/60",
                         collapsed && "justify-center",
                       )}
                     >
@@ -223,7 +223,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                       {!collapsed && (
                         <span className="flex flex-1 items-center justify-between">
                           {item.label}
-                          <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">
+                          <span className="rounded-full bg-sidebar-hover px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">
                             Próx.
                           </span>
                         </span>
@@ -243,11 +243,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
                     aria-current={active ? "page" : undefined}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                       collapsed && "justify-center",
                       active
                         ? "bg-accent text-accent-foreground"
-                        : "text-footer-text hover:bg-white/10",
+                        : "text-sidebar-text hover:bg-sidebar-hover",
                     )}
                   >
                     {item.icon}

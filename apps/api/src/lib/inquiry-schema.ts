@@ -18,3 +18,9 @@ export const inquiryListQuerySchema = z.object({
 });
 
 export type InquiryListQuery = z.infer<typeof inquiryListQuerySchema>;
+
+export const adminInquiryFiltersSchema = z.object({
+  search: z.string().trim().min(1).optional(),
+});
+
+export type AdminInquiryFilters = z.infer<typeof adminInquiryFiltersSchema>;

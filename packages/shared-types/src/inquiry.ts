@@ -38,3 +38,22 @@ export type PaginatedInquiries = {
   pageSize: number;
   totalPages: number;
 };
+
+export type AdminInquiryDTO = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  createdAt: string;
+  property: {
+    id: string;
+    title: string;
+    mainImage: PropertyImageDTO | null;
+  };
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+};

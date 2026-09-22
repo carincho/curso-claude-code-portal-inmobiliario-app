@@ -28,6 +28,14 @@
   --accent-hover: #9a3412;
   --accent-foreground: #ffffff;
   --accent-soft: #fff7ed;
+
+  /* Menú lateral del panel admin: propio del tema, no compartido con el footer público.
+     Tema claro: azul grisáceo pastel para diferenciarlo del blanco de las tarjetas. */
+  --sidebar-bg: #e9eef5;
+  --sidebar-text: #1e293b;
+  --sidebar-text-muted: #64748b;
+  --sidebar-border: #d6dfea;
+  --sidebar-hover: rgb(30 41 59 / 8%);
 }
 
 /*
@@ -43,6 +51,12 @@
   --card-bg: #1e293b;
   --card-border: #334155;
   --muted-foreground: #94a3b8;
+
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #cbd5e1;
+  --sidebar-text-muted: #94a3b8;
+  --sidebar-border: rgb(255 255 255 / 10%);
+  --sidebar-hover: rgb(255 255 255 / 10%);
 }
 
 @theme inline {
@@ -53,6 +67,11 @@
   --color-footer: var(--footer-bg);
   --color-footer-text: var(--footer-text);
   --color-footer-text-muted: var(--footer-text-muted);
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-muted: var(--sidebar-text-muted);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-hover: var(--sidebar-hover);
   --color-card: var(--card-bg);
   --color-card-border: var(--card-border);
   --color-muted-foreground: var(--muted-foreground);

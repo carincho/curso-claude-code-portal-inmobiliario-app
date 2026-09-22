@@ -20,18 +20,22 @@ export function updateUser(
   return prisma.user.update({ where: { id }, data });
 }
 
-export function findAllUsers(filters: { search?: string; role?: Role }) {
+async function findUserIdsMatchingSearch(search: string): Promise<string[]> {
+  const pattern = `%${search}%`;
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT id FROM users
+    WHERE unaccent(name) ILIKE unaccent(${pattern})
+       OR unaccent(email) ILIKE unaccent(${pattern})
+  `;
+
+  return rows.map((row) => row.id);
+}
+
+export async function findAllUsers(filters: { search?: string; role?: Role }) {
   return prisma.user.findMany({
     where: {
       ...(filters.role ? { role: filters.role } : {}),
-      ...(filters.search
-        ? {
-            OR: [
-              { name: { contains: filters.search, mode: "insensitive" as const } },
-              { email: { contains: filters.search, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
+      ...(filters.search ? { id: { in: await findUserIdsMatchingSearch(filters.search) } } : {}),
     },
     orderBy: { createdAt: "desc" },
   });

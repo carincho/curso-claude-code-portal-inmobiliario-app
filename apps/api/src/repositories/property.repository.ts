@@ -16,10 +16,24 @@ const SORT_ORDER_BY = {
   area_desc: { usableArea: { sort: "desc" as const, nulls: "last" as const } },
 };
 
-function buildPropertyWhere(
+async function findPropertyIdsMatchingSearch(search: string): Promise<string[]> {
+  const pattern = `%${search}%`;
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT id FROM properties
+    WHERE unaccent(title) ILIKE unaccent(${pattern})
+       OR unaccent(description) ILIKE unaccent(${pattern})
+       OR unaccent(commune) ILIKE unaccent(${pattern})
+       OR unaccent(city) ILIKE unaccent(${pattern})
+       OR unaccent(region) ILIKE unaccent(${pattern})
+  `;
+
+  return rows.map((row) => row.id);
+}
+
+async function buildPropertyWhere(
   filters: AdminPropertyFilters,
   { publishedOnly }: { publishedOnly: boolean },
-): Prisma.PropertyWhereInput {
+): Promise<Prisma.PropertyWhereInput> {
   const {
     search,
     operation,
@@ -74,23 +88,13 @@ function buildPropertyWhere(
           },
         }
       : {}),
-    ...(search
-      ? {
-          OR: [
-            { title: { contains: search, mode: "insensitive" as const } },
-            { description: { contains: search, mode: "insensitive" as const } },
-            { commune: { contains: search, mode: "insensitive" as const } },
-            { city: { contains: search, mode: "insensitive" as const } },
-            { region: { contains: search, mode: "insensitive" as const } },
-          ],
-        }
-      : {}),
+    ...(search ? { id: { in: await findPropertyIdsMatchingSearch(search) } } : {}),
   };
 }
 
-export function findPublishedProperties(filters: PropertyFilters = {}) {
+export async function findPublishedProperties(filters: PropertyFilters = {}) {
   return prisma.property.findMany({
-    where: buildPropertyWhere(filters, { publishedOnly: true }),
+    where: await buildPropertyWhere(filters, { publishedOnly: true }),
     include: publicPropertyInclude,
     orderBy: SORT_ORDER_BY[filters.sort ?? "newest"],
   });
@@ -132,9 +136,9 @@ export async function findDistinctPublishedLocations() {
   };
 }
 
-export function findAllProperties(filters: AdminPropertyFilters = {}) {
+export async function findAllProperties(filters: AdminPropertyFilters = {}) {
   return prisma.property.findMany({
-    where: buildPropertyWhere(filters, { publishedOnly: false }),
+    where: await buildPropertyWhere(filters, { publishedOnly: false }),
     include: publicPropertyInclude,
     orderBy: SORT_ORDER_BY[filters.sort ?? "newest"],
   });
