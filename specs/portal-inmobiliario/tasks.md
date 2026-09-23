@@ -282,3 +282,24 @@
     consistente con `toErrorResponse`.
   - Verificado en build de producción (`next start`): exactamente 100 requests permitidos, el
     101º bloqueado; la ventana se libera pasado 1 minuto.
+
+## Fase 7 — Infraestructura (solicitada por el usuario)
+
+- [x] **Paso 41 — Migrar la base de datos de local a Supabase**
+  - `apps/api/prisma.config.ts`: datasource apunta a `DIRECT_URL` (conexión directa, puerto
+    `5432`) para que `prisma migrate` pueda ejecutar DDL; el runtime (`lib/prisma.ts`) sigue
+    usando `DATABASE_URL` (Transaction Pooler, puerto `6543`, `?pgbouncer=true`) sin cambios.
+  - `prisma migrate deploy` aplicó las 4 migraciones existentes contra Supabase, recreando el
+    esquema completo (tablas, índices, extensión `unaccent`) sin modificar ni un archivo de
+    migración.
+  - Datos migrados con `pg_dump --data-only` (tabla por tabla, en orden de dependencia por
+    llaves foráneas) desde el Postgres local en Docker, restaurados con `psql` contra
+    `DIRECT_URL`. Verificado que los conteos de filas coinciden exactamente entre origen y
+    destino en las 7 tablas (`users`, `properties`, `property_images`, `features`, `favorites`,
+    `inquiries`, `_FeatureToProperty`).
+  - Verificado end-to-end contra Supabase: catálogo público, login (confirma que los hashes de
+    contraseña migraron íntegros), búsqueda sin acentos (`unaccent`) y build/lint de ambas apps.
+  - RLS no se activó (decisión explícita del usuario): la autorización la sigue haciendo
+    `apps/api` en el backend, igual que antes — Prisma conecta directo a Postgres sin pasar por
+    el Data API de Supabase. Se usó el rol `postgres` existente en vez de crear un rol `prisma`
+    dedicado (también decisión explícita del usuario).

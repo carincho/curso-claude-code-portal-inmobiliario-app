@@ -5,8 +5,8 @@ buscar y filtrar propiedades en venta o arriendo, ver su detalle completo (galer
 características) y solicitar información. Los usuarios registrados pueden guardar propiedades
 favoritas y revisar sus consultas; los administradores gestionan el portal desde un área privada.
 
-Construido con **Next.js + React + TypeScript**, **PostgreSQL** (vía Prisma) y **Spec-Driven
-Development (SDD)** con Claude Code.
+Construido con **Next.js + React + TypeScript**, **PostgreSQL en Supabase** (vía Prisma) y
+**Spec-Driven Development (SDD)** con Claude Code.
 
 ## Stack técnico
 
@@ -14,7 +14,9 @@ Development (SDD)** con Claude Code.
 - **Frontend** (`apps/web`): Next.js (App Router) + React + TypeScript + Tailwind CSS. Consume el
   backend exclusivamente vía REST — sin Server Actions ni acceso directo a la base de datos.
 - **Backend** (`apps/api`): Next.js usado solo como API REST (Route Handlers) + Prisma ORM +
-  PostgreSQL, con capas separadas de servicios y repositorios.
+  PostgreSQL (hospedado en Supabase), con capas separadas de servicios y repositorios. Prisma
+  conecta directo vía `@prisma/adapter-pg` — no se usa el Data API ni los clientes de Supabase
+  (`supabase-js`), así que RLS no aplica: la autorización la hace la propia API REST.
 - **Tipos compartidos** (`packages/shared-types`): DTOs usados por ambas apps, sin dependencia de
   Prisma.
 - **Integraciones**: Cloudinary (imágenes), Google Maps (ubicación) y Web3Forms (contacto).
@@ -29,7 +31,7 @@ El desarrollo se hizo siguiendo **Spec-Driven Development (SDD)**: la especifica
 ([`plan.md`](./specs/portal-inmobiliario/plan.md)) son la fuente de verdad, y el avance se
 registró tarea por tarea en [`tasks.md`](./specs/portal-inmobiliario/tasks.md).
 
-**El SDD está terminado: las 40 tareas de las 6 fases están completas.**
+**El SDD está terminado: las 41 tareas de las 7 fases están completas.**
 
 | Fase | Estado | Pasos |
 |---|---|---|
@@ -39,6 +41,7 @@ registró tarea por tarea en [`tasks.md`](./specs/portal-inmobiliario/tasks.md).
 | 4 — Administración | ✅ Completa | 22-30 |
 | 5 — Calidad y finalización | ✅ Completa | 31-37 |
 | 6 — Seguridad y experiencia | ✅ Completa | 38-40 |
+| 7 — Infraestructura | ✅ Completa | 41 |
 
 ### Qué incluye el portal
 
@@ -56,6 +59,8 @@ registró tarea por tarea en [`tasks.md`](./specs/portal-inmobiliario/tasks.md).
   pantalla) y diseño responsive en desktop, tablet y móvil.
 - **Seguridad y experiencia**: bloqueo de cuentas por intentos fallidos de login, rate limiting
   general de la API contra bots, y mensajes flash de confirmación en las acciones principales.
+- **Infraestructura**: base de datos en Supabase (esquema y datos migrados desde Postgres local
+  con cero pérdida de información), lista para desplegar en un entorno serverless.
 
 Detalle completo de cada tarea, con lo que se verificó al terminarla, en
 [`tasks.md`](./specs/portal-inmobiliario/tasks.md).
@@ -84,16 +89,23 @@ Detalle completo de cada tarea, con lo que se verificó al terminarla, en
 ### 1. Requisitos
 
 - Node.js 20+
-- PostgreSQL accesible (local, Docker, o un servicio administrado)
+- Un proyecto de [Supabase](https://supabase.com/dashboard) (Postgres administrado). Cualquier
+  otro Postgres 15+ también funciona (local, Docker, otro proveedor) — solo ajusta las variables
+  de entorno del paso 2.
 
 ### 2. Variables de entorno
 
 Cada app tiene su propio `.env.example`:
 
 ```bash
-cp apps/api/.env.example apps/api/.env   # DATABASE_URL, AUTH_SECRET, Cloudinary, CORS
+cp apps/api/.env.example apps/api/.env   # DATABASE_URL, DIRECT_URL, AUTH_SECRET, Cloudinary, CORS
 cp apps/web/.env.example apps/web/.env   # API_URL, NEXT_PUBLIC_SITE_URL, Google Maps, Web3Forms
 ```
+
+En `apps/api/.env`, saca `DATABASE_URL` y `DIRECT_URL` desde tu proyecto de Supabase:
+**Project Settings → Database → Connection string**. `DATABASE_URL` es el *Transaction pooler*
+(puerto `6543`, con `?pgbouncer=true` al final — la usa la app en runtime) y `DIRECT_URL` es la
+*conexión directa* (puerto `5432` — la usa Prisma solo para migraciones).
 
 ### 3. Instalar dependencias y preparar la base de datos
 
@@ -138,8 +150,9 @@ specs/portal-inmobiliario/
 └── tasks.md   # Lista de tareas incrementales y su estado (checklist)
 ```
 
-Las 40 tareas de `tasks.md` están marcadas como completadas: el ciclo de SDD original ya
-convergió (ver Paso 37 — Convergencia final del SDD). `spec.md` y `tasks.md` siguen siendo la
+Las 41 tareas de `tasks.md` están marcadas como completadas: el ciclo de SDD original ya
+convergió (ver Paso 37 — Convergencia final del SDD), y las fases agregadas después (6 y 7) se
+documentaron y registraron con el mismo formato. `spec.md` y `tasks.md` siguen siendo la
 referencia para entender qué hace el portal y con qué se validó cada parte.
 
 ### Seguir extendiendo el proyecto con Claude Code

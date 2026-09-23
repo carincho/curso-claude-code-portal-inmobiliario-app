@@ -10,7 +10,7 @@ características, usuarios y consultas) desde un área privada. Construido como 
 `apps/web` (frontend Next.js) y `apps/api` (backend Next.js solo API REST) sobre PostgreSQL — ver
 "Estado actual del proyecto" más abajo para el detalle de la arquitectura y el progreso.
 
-**El SDD original ya convergió: las 40 tareas de las 6 fases de
+**El SDD original ya convergió: las 41 tareas de las 7 fases de
 `specs/portal-inmobiliario/tasks.md` están completas.** Cualquier funcionalidad nueva que se pida
 de aquí en adelante se documenta primero en `spec.md`/`plan.md`, se agrega como tarea nueva en
 `tasks.md` y luego se implementa siguiendo el mismo flujo de siempre (ver "Flujo de desarrollo").
@@ -106,10 +106,21 @@ packages/shared-types/  DTOs compartidos entre ambas apps (sin dependencia de Pr
 - Levantar todo: `npm run dev` desde la raíz (arranca ambas apps en paralelo vía Turborepo).
 - Detalle completo de la arquitectura: `specs/portal-inmobiliario/plan.md` §1 y §4.
 
-### Base de datos y herramientas locales
-- PostgreSQL corre en Docker (contenedor `postgres`, imagen `pgvector/pgvector:pg16-trixie`), compartido con otros proyectos del equipo — la base de este proyecto es `portal_inmobiliario`, no tocar otras bases del mismo contenedor.
-- ORM: **Prisma 7** (pinneado explícitamente — `npm install prisma` resuelve "latest" a un release candidate 8.x, evitarlo) con `@prisma/adapter-pg`.
-- pgAdmin corre en Docker con `--restart always`, accesible en `http://localhost:5050`.
+### Base de datos
+- PostgreSQL corre en **Supabase** (proyecto administrado, no local) — se migró desde el
+  Postgres local en Docker que se usó durante el desarrollo inicial; esquema y datos completos
+  ya están en Supabase.
+- Dos cadenas de conexión, ambas en `apps/api/.env` (nunca en `.env.example` con valores reales):
+  `DATABASE_URL` (Transaction Pooler, puerto `6543`, con `?pgbouncer=true` — la usa el runtime de
+  la app vía el driver adapter en `apps/api/src/lib/prisma.ts`) y `DIRECT_URL` (conexión directa,
+  puerto `5432` — la usa `apps/api/prisma.config.ts` solo para `prisma migrate`, ya que el
+  Transaction Pooler no soporta los comandos DDL que las migraciones necesitan).
+- ORM: **Prisma 7** (pinneado explícitamente — `npm install prisma` resuelve "latest" a un
+  release candidate 8.x, evitarlo) con `@prisma/adapter-pg`.
+- El contenedor Docker `postgres` (imagen `pgvector/pgvector:pg16-trixie`, compartido con otros
+  proyectos del equipo) y pgAdmin (`http://localhost:5050`) ya no son necesarios para este
+  proyecto, aunque pueden seguir corriendo para otros proyectos del equipo — no tocar otras bases
+  de ese contenedor.
 
 ### Progreso (Spec-Driven Development)
 - **Fase 1 — Fundamentos**: completa (Pasos 1-5).
@@ -125,6 +136,10 @@ packages/shared-types/  DTOs compartidos entre ambas apps (sin dependencia de Pr
   `lockedUntil` en PostgreSQL), sistema de mensajes flash (`FlashProvider`) para login/logout y
   administración de usuarios/propiedades/características, y rate limiting general de requests
   (100/min por IP sobre `/api/**`, en memoria, `apps/api/src/proxy.ts`).
+- **Fase 7 — Infraestructura**: completa (Paso 41) — migración de la base de datos de Postgres
+  local (Docker) a Supabase, con esquema (vía `prisma migrate deploy`) y datos completos
+  (`pg_dump`/`psql`) migrados sin pérdida; ver "Base de datos" más arriba para el detalle de la
+  configuración de conexión.
 - Progreso detallado y checklist: `specs/portal-inmobiliario/tasks.md`.
 
 ### Sistema de diseño (frontend)

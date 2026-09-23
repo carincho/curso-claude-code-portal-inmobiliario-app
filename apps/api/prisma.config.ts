@@ -9,7 +9,11 @@ export default defineConfig({
     path: "prisma/migrations",
     seed: "tsx prisma/seed.ts",
   },
+  // Las migraciones (DDL) necesitan una conexión de sesión estable, no el
+  // transaction pooler que usa el runtime de la app (ver lib/prisma.ts):
+  // PgBouncer en modo transacción no soporta los comandos que Prisma Migrate
+  // necesita ejecutar.
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: process.env["DIRECT_URL"],
   },
 });

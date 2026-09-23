@@ -108,7 +108,19 @@ Property * --- * Feature
 
 ## 6. Persistencia
 
-PostgreSQL es la única base de datos.
+PostgreSQL es la única base de datos. El proyecto lo hospeda en **Supabase** (Postgres
+administrado) — se migró desde un Postgres local en Docker usado durante el desarrollo inicial.
+Prisma conecta directo a Postgres vía `@prisma/adapter-pg`; no se usa el Data API de Supabase ni
+`supabase-js`, así que Row Level Security (RLS) no aplica aquí — la autorización sigue siendo
+responsabilidad exclusiva de `apps/api` (ver §10).
+
+Al usarse en modo serverless, la conexión se divide en dos:
+
+- `DATABASE_URL` — Transaction Pooler de Supabase (puerto `6543`, `?pgbouncer=true`), usada por
+  el driver adapter en runtime (`apps/api/src/lib/prisma.ts`);
+- `DIRECT_URL` — conexión directa/de sesión (puerto `5432`), usada únicamente por
+  `apps/api/prisma.config.ts` para `prisma migrate`, ya que el Transaction Pooler no soporta los
+  comandos DDL que las migraciones necesitan.
 
 Seleccionar un ORM compatible con las versiones actuales de Next.js y PostgreSQL.
 
@@ -343,7 +355,9 @@ Cada app del monorepo tiene su propio `.env` / `.env.example` (sin secretos real
 
 `apps/api/.env`:
 
-- `DATABASE_URL` (conexión PostgreSQL);
+- `DATABASE_URL` (conexión PostgreSQL en Supabase, Transaction Pooler — usada en runtime, ver
+  §6);
+- `DIRECT_URL` (conexión directa a Supabase — usada solo por Prisma Migrate, ver §6);
 - `AUTH_SECRET` (secretos de autenticación);
 - credenciales Cloudinary (`CLOUDINARY_*`);
 - `CORS_ALLOWED_ORIGIN` (origen permitido de `apps/web`).
