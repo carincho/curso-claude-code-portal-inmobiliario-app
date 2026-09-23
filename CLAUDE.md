@@ -10,6 +10,11 @@ características, usuarios y consultas) desde un área privada. Construido como 
 `apps/web` (frontend Next.js) y `apps/api` (backend Next.js solo API REST) sobre PostgreSQL — ver
 "Estado actual del proyecto" más abajo para el detalle de la arquitectura y el progreso.
 
+**El SDD original ya convergió: las 40 tareas de las 6 fases de
+`specs/portal-inmobiliario/tasks.md` están completas.** Cualquier funcionalidad nueva que se pida
+de aquí en adelante se documenta primero en `spec.md`/`plan.md`, se agrega como tarea nueva en
+`tasks.md` y luego se implementa siguiendo el mismo flujo de siempre (ver "Flujo de desarrollo").
+
 ## Instrucciones del proyecto
 
 Este proyecto utiliza **Spec-Driven Development (SDD)**.

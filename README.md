@@ -17,28 +17,48 @@ Development (SDD)** con Claude Code.
   PostgreSQL, con capas separadas de servicios y repositorios.
 - **Tipos compartidos** (`packages/shared-types`): DTOs usados por ambas apps, sin dependencia de
   Prisma.
-- **Integraciones**: Cloudinary (imágenes), Google Maps (ubicación) y Web3Forms (contacto) — se
-  incorporan de forma incremental según el plan técnico.
+- **Integraciones**: Cloudinary (imágenes), Google Maps (ubicación) y Web3Forms (contacto).
+- **Seguridad**: hashing de contraseñas con bcrypt, sesión vía JWT en cookie `httpOnly`,
+  autorización verificada en cada request contra la base de datos (no solo contra el token),
+  bloqueo de cuentas tras 5 intentos fallidos de login y rate limiting general de la API por IP.
 
 ## Estado del proyecto
 
-Progreso según [`specs/portal-inmobiliario/tasks.md`](./specs/portal-inmobiliario/tasks.md),
-fuente de verdad del avance (14 de 37 pasos completados):
+El desarrollo se hizo siguiendo **Spec-Driven Development (SDD)**: la especificación
+([`spec.md`](./specs/portal-inmobiliario/spec.md)) y el plan técnico
+([`plan.md`](./specs/portal-inmobiliario/plan.md)) son la fuente de verdad, y el avance se
+registró tarea por tarea en [`tasks.md`](./specs/portal-inmobiliario/tasks.md).
+
+**El SDD está terminado: las 40 tareas de las 6 fases están completas.**
 
 | Fase | Estado | Pasos |
 |---|---|---|
 | 1 — Fundamentos | ✅ Completa | 1-5 |
-| 2 — Portal público | 🟡 En progreso (9/11) | 6-14 hechos · 15-16 pendientes |
-| 3 — Autenticación y usuario | ⬜ Pendiente | 17-21 |
-| 4 — Administración | ⬜ Pendiente | 22-30 |
-| 5 — Calidad y finalización | ⬜ Pendiente | 31-37 |
+| 2 — Portal público | ✅ Completa | 6-16 |
+| 3 — Autenticación y usuario | ✅ Completa | 17-21 |
+| 4 — Administración | ✅ Completa | 22-30 |
+| 5 — Calidad y finalización | ✅ Completa | 31-37 |
+| 6 — Seguridad y experiencia | ✅ Completa | 38-40 |
 
-**Ya funciona**: landing page, catálogo con búsqueda/filtros combinables/ordenamiento, detalle de
-propiedad con galería de imágenes, y la API REST pública detrás de todo (`GET /api/properties`,
-`GET /api/properties/{id}`).
+### Qué incluye el portal
 
-**Sigue** (Fase 2): integrar Google Maps en el detalle (Paso 15) y el formulario de contacto con
-Web3Forms (Paso 16) — luego continúa con autenticación, favoritos, y el panel de administración.
+- **Visitantes**: landing page, catálogo con búsqueda textual, filtros combinables y
+  ordenamiento, detalle de propiedad con galería de imágenes, ubicación en Google Maps y
+  formulario de contacto (Web3Forms + persistencia en PostgreSQL).
+- **Usuarios registrados**: registro/login/logout, cuenta propia con edición de datos,
+  propiedades guardadas como favoritas y consulta de las propiedades por las que ya preguntaron.
+- **Administradores**: panel privado con dashboard de indicadores, CRUD de propiedades (con
+  publicar/despublicar y destacar), administración de imágenes (Cloudinary sincronizado con
+  PostgreSQL), administración de características, administración de usuarios (alta, activar o
+  desactivar, cambiar rol) y revisión de consultas.
+- **Calidad**: metadata dinámica y Open Graph para SEO, consultas e imágenes optimizadas,
+  accesibilidad (navegación por teclado, foco visible, jerarquía de encabezados, lectores de
+  pantalla) y diseño responsive en desktop, tablet y móvil.
+- **Seguridad y experiencia**: bloqueo de cuentas por intentos fallidos de login, rate limiting
+  general de la API contra bots, y mensajes flash de confirmación en las acciones principales.
+
+Detalle completo de cada tarea, con lo que se verificó al terminarla, en
+[`tasks.md`](./specs/portal-inmobiliario/tasks.md).
 
 ## Estructura del repositorio
 
@@ -54,6 +74,7 @@ Web3Forms (Paso 16) — luego continúa con autenticación, favoritos, y el pane
 │       ├── spec.md
 │       ├── plan.md
 │       └── tasks.md
+├── scripts/                    # Scripts de soporte para el entorno de desarrollo
 ├── CLAUDE.md                   # Instrucciones permanentes para Claude Code
 └── turbo.json
 ```
@@ -70,8 +91,8 @@ Web3Forms (Paso 16) — luego continúa con autenticación, favoritos, y el pane
 Cada app tiene su propio `.env.example`:
 
 ```bash
-cp apps/api/.env.example apps/api/.env   # DATABASE_URL, Cloudinary, Web3Forms, CORS
-cp apps/web/.env.example apps/web/.env   # API_URL, Google Maps
+cp apps/api/.env.example apps/api/.env   # DATABASE_URL, AUTH_SECRET, Cloudinary, CORS
+cp apps/web/.env.example apps/web/.env   # API_URL, NEXT_PUBLIC_SITE_URL, Google Maps, Web3Forms
 ```
 
 ### 3. Instalar dependencias y preparar la base de datos
@@ -91,6 +112,12 @@ npm run dev
 Esto arranca `apps/web` (http://localhost:3000) y `apps/api` (http://localhost:3001) en paralelo
 vía Turborepo.
 
+> **macOS + iCloud Drive**: si el proyecto vive dentro de una carpeta sincronizada por iCloud
+> (por ejemplo `~/Desktop` con "Desktop & Documents" activado), iCloud puede corromper la caché
+> de desarrollo de Next.js mientras se escribe (`.next`, `.turbo`). `npm run dev` ejecuta
+> automáticamente `scripts/exclude-build-dirs-from-icloud.sh` (hook `predev`) para excluir esas
+> carpetas de la sincronización — no requiere ninguna acción manual.
+
 ### Otros comandos útiles
 
 ```bash
@@ -101,8 +128,8 @@ npm run db:studio    # explorar la base de datos con Prisma Studio
 
 ## Desarrollo guiado por especificación (SDD)
 
-El proyecto se construye siguiendo **Spec-Driven Development**: la especificación es la fuente de
-verdad y las tareas se implementan una por una, en orden.
+El proyecto se construyó siguiendo **Spec-Driven Development**: la especificación es la fuente de
+verdad y las tareas se implementaron una por una, en orden.
 
 ```text
 specs/portal-inmobiliario/
@@ -111,19 +138,24 @@ specs/portal-inmobiliario/
 └── tasks.md   # Lista de tareas incrementales y su estado (checklist)
 ```
 
-`tasks.md` refleja el progreso real del proyecto en todo momento — es el mejor lugar para ver qué
-está implementado y qué falta.
+Las 40 tareas de `tasks.md` están marcadas como completadas: el ciclo de SDD original ya
+convergió (ver Paso 37 — Convergencia final del SDD). `spec.md` y `tasks.md` siguen siendo la
+referencia para entender qué hace el portal y con qué se validó cada parte.
 
-### Continuar el desarrollo con Claude Code
+### Seguir extendiendo el proyecto con Claude Code
+
+Con el SDD original terminado, cualquier funcionalidad nueva se agrega de la misma forma: primero
+se documenta en `spec.md`/`plan.md`, después se registra como tarea nueva en `tasks.md`, y luego
+se implementa. Así se hizo, por ejemplo, con la Fase 6 (rate limiting y mensajes flash), agregada
+a pedido del usuario después de terminar la Fase 5.
 
 ```text
-Continúa con la siguiente tarea pendiente de tasks.md.
+Quiero agregar [descripción de la funcionalidad nueva].
 
-Consulta spec.md y plan.md cuando sea necesario.
-Implementa únicamente esa tarea, valida los cambios y márcala
-como completada cuando esté correctamente terminada.
-
-No avances a la siguiente tarea.
+Antes de implementarla, documéntala en spec.md y plan.md si
+corresponde, y agrégala como una tarea nueva en tasks.md.
+Después impleméntala, valida los cambios y marca la tarea
+como completada.
 ```
 
 Las instrucciones permanentes que Claude Code sigue en este repositorio están en
