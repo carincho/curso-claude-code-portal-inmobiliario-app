@@ -236,7 +236,19 @@ Requisitos:
 - no almacenar tokens sensibles en `localStorage`;
 - usuarios inactivos no pueden autenticarse;
 - endpoints ADMIN requieren ADMIN;
-- endpoints privados USER requieren autenticación.
+- endpoints privados USER requieren autenticación;
+- rate limiting de login: `User.failedLoginAttempts`/`User.lockedUntil` en PostgreSQL (sin
+  infraestructura adicional tipo Redis); 5 intentos fallidos bloquean la cuenta 15 minutos; un
+  login exitoso reinicia el contador (ver `spec.md` §26). Es **por cuenta**, no por IP: no
+  interfiere con el login de otras cuentas.
+- rate limiting general de requests: contador en memoria (`Map` a nivel de módulo) dentro de
+  `apps/api/src/proxy.ts` (convención `proxy` de Next.js 16, reemplaza a `middleware.ts`), 100
+  requests/minuto por IP sobre `/api/:path*` (ver `spec.md` §27). Deliberadamente **no**
+  persistido en PostgreSQL ni en Redis: es un contador de altísima frecuencia y vida corta, y
+  escribirlo a PostgreSQL en cada request le metería justo el tipo de carga de la que se supone
+  que protege a la base de datos. Si el proyecto pasa a correr múltiples instancias, migrar a un
+  almacén compartido (Upstash Redis u otro) para que el límite aplique de forma consistente entre
+  todas.
 
 ## 11. Cloudinary
 
@@ -340,7 +352,9 @@ Cada app del monorepo tiene su propio `.env` / `.env.example` (sin secretos real
 
 - `API_URL` (URL de `apps/api`, usada server-side por el frontend para consumir la API REST);
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`;
-- `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (público por diseño de Web3Forms, ver §13).
+- `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (público por diseño de Web3Forms, ver §13);
+- `NEXT_PUBLIC_SITE_URL` (URL pública del frontend, usada para generar metadata absoluta — Open
+  Graph, canonical — ver `spec.md` §25).
 
 ## 16. Validación
 

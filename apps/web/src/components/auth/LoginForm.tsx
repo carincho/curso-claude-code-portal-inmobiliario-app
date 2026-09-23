@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFlash } from "@/components/flash/FlashProvider";
 import { loginUser } from "@/lib/auth-client";
 import { loginFormSchema, type LoginFormValues } from "@/lib/auth-form-schemas";
 
@@ -17,6 +18,7 @@ const errorClassName = "mt-1 text-xs text-red-600";
 export function LoginForm() {
   const router = useRouter();
   const { apiUrl, setUser } = useAuth();
+  const { showFlash } = useFlash();
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -30,6 +32,7 @@ export function LoginForm() {
     try {
       const user = await loginUser(apiUrl, values);
       setUser(user);
+      showFlash("success", `Bienvenido, ${user.name}.`);
       router.push(user.role === "ADMIN" ? "/admin" : "/");
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "No se pudo iniciar sesión");
@@ -42,7 +45,13 @@ export function LoginForm() {
         <label htmlFor="login-email" className={labelClassName}>
           Email
         </label>
-        <input id="login-email" type="email" className={fieldClassName} {...register("email")} />
+        <input
+          id="login-email"
+          type="email"
+          autoComplete="email"
+          className={fieldClassName}
+          {...register("email")}
+        />
         {errors.email && <p className={errorClassName}>{errors.email.message}</p>}
       </div>
 
@@ -53,13 +62,18 @@ export function LoginForm() {
         <input
           id="login-password"
           type="password"
+          autoComplete="current-password"
           className={fieldClassName}
           {...register("password")}
         />
         {errors.password && <p className={errorClassName}>{errors.password.message}</p>}
       </div>
 
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="text-sm text-red-600">
+          {serverError}
+        </p>
+      )}
 
       <button
         type="submit"

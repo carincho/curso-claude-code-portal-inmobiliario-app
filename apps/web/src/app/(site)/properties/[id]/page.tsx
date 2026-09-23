@@ -22,9 +22,22 @@ export async function generateMetadata(
     return { title: "Propiedad no encontrada | Portal Inmobiliario" };
   }
 
+  const title = `${property.title} | Portal Inmobiliario`;
+  const description = property.description.slice(0, 160);
+  const url = `/properties/${property.id}`;
+  const mainImageUrl = property.mainImage?.url;
+
   return {
-    title: `${property.title} | Portal Inmobiliario`,
-    description: property.description.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url,
+      images: mainImageUrl ? [{ url: mainImageUrl }] : undefined,
+    },
   };
 }
 

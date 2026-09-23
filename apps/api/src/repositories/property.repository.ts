@@ -8,6 +8,17 @@ export const publicPropertyInclude = {
   features: true,
 };
 
+// Las vistas de listado (catálogo, landing, favoritos, admin) solo necesitan la imagen
+// principal: se evita traer el resto de imágenes y las características de cada propiedad.
+export const listPropertyInclude = {
+  images: {
+    orderBy: [{ isMain: "desc" as const }, { position: "asc" as const }],
+    take: 1,
+  },
+};
+
+export type ListedProperty = Prisma.PropertyGetPayload<{ include: typeof listPropertyInclude }>;
+
 const SORT_ORDER_BY = {
   newest: { createdAt: "desc" as const },
   price_asc: { price: "asc" as const },
@@ -95,7 +106,7 @@ async function buildPropertyWhere(
 export async function findPublishedProperties(filters: PropertyFilters = {}) {
   return prisma.property.findMany({
     where: await buildPropertyWhere(filters, { publishedOnly: true }),
-    include: publicPropertyInclude,
+    include: listPropertyInclude,
     orderBy: SORT_ORDER_BY[filters.sort ?? "newest"],
   });
 }
@@ -139,7 +150,7 @@ export async function findDistinctPublishedLocations() {
 export async function findAllProperties(filters: AdminPropertyFilters = {}) {
   return prisma.property.findMany({
     where: await buildPropertyWhere(filters, { publishedOnly: false }),
-    include: publicPropertyInclude,
+    include: listPropertyInclude,
     orderBy: SORT_ORDER_BY[filters.sort ?? "newest"],
   });
 }

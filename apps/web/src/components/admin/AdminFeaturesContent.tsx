@@ -3,6 +3,7 @@
 import type { FeatureDTO } from "@portal-inmobiliario/shared-types";
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFlash } from "@/components/flash/FlashProvider";
 import {
   createFeature,
   deleteFeature,
@@ -15,6 +16,7 @@ const inputClassName =
 
 export function AdminFeaturesContent() {
   const { apiUrl } = useAuth();
+  const { showFlash } = useFlash();
   const [features, setFeatures] = useState<FeatureDTO[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -63,6 +65,7 @@ export function AdminFeaturesContent() {
       const created = await createFeature(apiUrl, name);
       setFeatures((prev) => [...(prev ?? []), created].sort((a, b) => a.name.localeCompare(b.name)));
       setNewName("");
+      showFlash("success", `Característica "${created.name}" creada correctamente.`);
     } catch (createErr) {
       setCreateError(
         createErr instanceof Error ? createErr.message : "No se pudo crear la característica",
@@ -103,6 +106,7 @@ export function AdminFeaturesContent() {
           .sort((a, b) => a.name.localeCompare(b.name)),
       );
       cancelEditing();
+      showFlash("success", `Característica renombrada a "${updated.name}" correctamente.`);
     } catch (renameErr) {
       setEditError(
         renameErr instanceof Error ? renameErr.message : "No se pudo renombrar la característica",
@@ -158,7 +162,11 @@ export function AdminFeaturesContent() {
             placeholder="Ej: Terraza, Piscina…"
             className={inputClassName}
           />
-          {createError && <p className="mt-1 text-xs text-red-600">{createError}</p>}
+          {createError && (
+            <p role="alert" className="mt-1 text-xs text-red-600">
+              {createError}
+            </p>
+          )}
         </div>
         <button
           type="submit"
@@ -171,7 +179,9 @@ export function AdminFeaturesContent() {
 
       <div className="mt-6">
         {error && (
-          <p className="text-sm text-red-600">No se pudieron cargar las características.</p>
+          <p role="alert" className="text-sm text-red-600">
+            No se pudieron cargar las características.
+          </p>
         )}
 
         {!error && features === null && (
@@ -216,7 +226,11 @@ export function AdminFeaturesContent() {
                     >
                       Cancelar
                     </button>
-                    {editError && <p className="text-xs text-red-600">{editError}</p>}
+                    {editError && (
+                      <p role="alert" className="text-xs text-red-600">
+                        {editError}
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <>

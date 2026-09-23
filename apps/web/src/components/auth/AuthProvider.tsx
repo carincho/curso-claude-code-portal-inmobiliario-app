@@ -2,6 +2,7 @@
 
 import type { UserDTO } from "@portal-inmobiliario/shared-types";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useFlash } from "@/components/flash/FlashProvider";
 import { fetchCurrentUser, logoutUser } from "@/lib/auth-client";
 
 type AuthContextValue = {
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ apiUrl, children }: { apiUrl: string; children: ReactNode }) {
   const [user, setUser] = useState<UserDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { showFlash } = useFlash();
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +38,7 @@ export function AuthProvider({ apiUrl, children }: { apiUrl: string; children: R
   async function logout() {
     await logoutUser(apiUrl);
     setUser(null);
+    showFlash("success", "Sesión cerrada correctamente.");
   }
 
   return (

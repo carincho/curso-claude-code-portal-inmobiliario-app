@@ -20,6 +20,14 @@ export function updateUser(
   return prisma.user.update({ where: { id }, data });
 }
 
+export function registerFailedLogin(id: string, failedLoginAttempts: number, lockedUntil: Date | null) {
+  return prisma.user.update({ where: { id }, data: { failedLoginAttempts, lockedUntil } });
+}
+
+export function clearFailedLogins(id: string) {
+  return prisma.user.update({ where: { id }, data: { failedLoginAttempts: 0, lockedUntil: null } });
+}
+
 async function findUserIdsMatchingSearch(search: string): Promise<string[]> {
   const pattern = `%${search}%`;
   const rows = await prisma.$queryRaw<{ id: string }[]>`

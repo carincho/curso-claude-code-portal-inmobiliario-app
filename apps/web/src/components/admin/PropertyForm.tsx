@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFlash } from "@/components/flash/FlashProvider";
 import { FeaturesInput } from "@/components/admin/FeaturesInput";
 import { PropertyImagesManager, type ManagedImage } from "@/components/admin/PropertyImagesManager";
 import {
@@ -72,6 +73,7 @@ type PendingImage = ManagedImage & { publicId: string };
 export function PropertyForm(props: PropertyFormProps) {
   const router = useRouter();
   const { apiUrl } = useAuth();
+  const { showFlash } = useFlash();
   const [features, setFeatures] = useState<string[]>([]);
   const [featureSuggestions, setFeatureSuggestions] = useState<string[]>([]);
   const [images, setImages] = useState<PendingImage[]>([]);
@@ -242,10 +244,12 @@ export function PropertyForm(props: PropertyFormProps) {
 
     try {
       if (props.mode === "edit") {
-        await updateAdminProperty(apiUrl, props.propertyId, payload);
+        const updated = await updateAdminProperty(apiUrl, props.propertyId, payload);
+        showFlash("success", `Propiedad "${updated.title}" actualizada correctamente.`);
       } else {
         const created = await createAdminProperty(apiUrl, payload);
         await attachPendingImages(created.id);
+        showFlash("success", `Propiedad "${created.title}" creada correctamente.`);
       }
 
       router.push("/admin/properties");
@@ -526,7 +530,11 @@ export function PropertyForm(props: PropertyFormProps) {
         </div>
       </section>
 
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="text-sm text-red-600">
+          {serverError}
+        </p>
+      )}
 
       <div className="flex items-center gap-4">
         <button

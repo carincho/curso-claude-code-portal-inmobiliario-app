@@ -42,7 +42,13 @@ export function RegisterForm() {
         <label htmlFor="register-name" className={labelClassName}>
           Nombre
         </label>
-        <input id="register-name" type="text" className={fieldClassName} {...register("name")} />
+        <input
+          id="register-name"
+          type="text"
+          autoComplete="name"
+          className={fieldClassName}
+          {...register("name")}
+        />
         {errors.name && <p className={errorClassName}>{errors.name.message}</p>}
       </div>
 
@@ -53,6 +59,7 @@ export function RegisterForm() {
         <input
           id="register-email"
           type="email"
+          autoComplete="email"
           className={fieldClassName}
           {...register("email")}
         />
@@ -66,13 +73,18 @@ export function RegisterForm() {
         <input
           id="register-password"
           type="password"
+          autoComplete="new-password"
           className={fieldClassName}
           {...register("password")}
         />
         {errors.password && <p className={errorClassName}>{errors.password.message}</p>}
       </div>
 
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="text-sm text-red-600">
+          {serverError}
+        </p>
+      )}
 
       <button
         type="submit"

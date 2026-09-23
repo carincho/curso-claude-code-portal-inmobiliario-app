@@ -39,7 +39,11 @@ function FavoritesSection({ apiUrl }: { apiUrl: string }) {
   }, [apiUrl]);
 
   if (error) {
-    return <p className="mt-3 text-sm text-red-600">No se pudieron cargar tus favoritos.</p>;
+    return (
+      <p role="alert" className="mt-3 text-sm text-red-600">
+        No se pudieron cargar tus favoritos.
+      </p>
+    );
   }
 
   if (properties === null || favoritesLoading) {
@@ -138,7 +142,9 @@ function InquiriesSection({ apiUrl }: { apiUrl: string }) {
 
       <div className="mt-3">
         {error && (
-          <p className="text-sm text-red-600">No se pudieron cargar tus consultas.</p>
+          <p role="alert" className="text-sm text-red-600">
+            No se pudieron cargar tus consultas.
+          </p>
         )}
 
         {!error && result === null && <p className="text-sm text-stone-500">Cargando…</p>}

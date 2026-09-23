@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { publicPropertyInclude } from "@/repositories/property.repository";
+import { listPropertyInclude } from "@/repositories/property.repository";
 
 export function findFavoritesByUserId(userId: string) {
   return prisma.favorite.findMany({
     where: { userId, property: { deletedAt: null } },
-    include: { property: { include: publicPropertyInclude } },
+    include: { property: { include: listPropertyInclude } },
     orderBy: { createdAt: "desc" },
   });
 }

@@ -16,6 +16,7 @@ export async function PropertyResults({
 
   return (
     <>
+      <h2 className="sr-only">Resultados</h2>
       <p className="mb-6 text-sm text-stone-600">
         {search ? (
           <>

@@ -112,7 +112,11 @@ export function PropertyImagesManager({
         className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border file:border-card-border file:bg-card file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground hover:file:border-accent hover:file:text-accent"
       />
       {isUploading && <p className="mt-2 text-xs text-muted-foreground">Subiendo…</p>}
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-2 text-xs text-red-600">
+          {error}
+        </p>
+      )}
 
       {images.length > 0 ? (
         <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">

@@ -45,7 +45,9 @@ export function AdminDashboardContent() {
 
       <div className="mt-6">
         {error && (
-          <p className="text-sm text-red-600">No se pudieron cargar los indicadores.</p>
+          <p role="alert" className="text-sm text-red-600">
+            No se pudieron cargar los indicadores.
+          </p>
         )}
 
         {!error && stats === null && <p className="text-sm text-muted-foreground">Cargando…</p>}

@@ -4,14 +4,18 @@ import type { LoginPayload, RegisterPayload, UpdateProfilePayload } from "@/lib/
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { createSessionToken } from "@/lib/session";
 import {
+  clearFailedLogins,
   createUser,
   findUserByEmail,
   findUserById,
+  registerFailedLogin,
   updateUser,
 } from "@/repositories/user.repository";
 import type { User } from "@/generated/prisma/client";
 
 const INVALID_CREDENTIALS_MESSAGE = "Credenciales inválidas";
+const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
 
 function toUserDTO(user: User): UserDTO {
   return {
@@ -49,10 +53,30 @@ export async function loginUser(
     throw new HttpError(401, INVALID_CREDENTIALS_MESSAGE);
   }
 
+  if (user.lockedUntil && user.lockedUntil > new Date()) {
+    const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60_000);
+    throw new HttpError(
+      429,
+      `Demasiados intentos fallidos. Intenta nuevamente en ${minutesLeft} ${minutesLeft === 1 ? "minuto" : "minutos"}.`,
+    );
+  }
+
   const isValidPassword = await verifyPassword(input.password, user.passwordHash);
 
   if (!isValidPassword) {
+    const attempts = user.failedLoginAttempts + 1;
+
+    if (attempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
+      await registerFailedLogin(user.id, 0, new Date(Date.now() + LOCKOUT_DURATION_MS));
+      throw new HttpError(429, "Demasiados intentos fallidos. Intenta nuevamente en 15 minutos.");
+    }
+
+    await registerFailedLogin(user.id, attempts, null);
     throw new HttpError(401, INVALID_CREDENTIALS_MESSAGE);
+  }
+
+  if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+    await clearFailedLogins(user.id);
   }
 
   const token = await createSessionToken({ sub: user.id, role: user.role });

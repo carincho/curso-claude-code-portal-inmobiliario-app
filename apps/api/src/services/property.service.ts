@@ -18,7 +18,11 @@ import type {
   PropertyLocations,
 } from "@portal-inmobiliario/shared-types";
 
-export function toListItem(property: PublishedProperty): PropertyListItem {
+type PropertyForListItem = Omit<PublishedProperty, "images" | "features"> & {
+  images: Pick<PublishedProperty["images"][number], "id" | "url" | "position" | "isMain">[];
+};
+
+export function toListItem(property: PropertyForListItem): PropertyListItem {
   const mainImage = property.images.find((image) => image.isMain) ?? property.images[0] ?? null;
 
   return {

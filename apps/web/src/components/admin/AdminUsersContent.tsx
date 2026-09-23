@@ -3,6 +3,7 @@
 import type { Role, UserDTO } from "@portal-inmobiliario/shared-types";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFlash } from "@/components/flash/FlashProvider";
 import { createUser, fetchUsers, updateUser } from "@/lib/admin-users-client";
 import { formatDate } from "@/lib/format";
 
@@ -25,6 +26,7 @@ const EMPTY_CREATE_DRAFT = { name: "", email: "", password: "", role: "USER" as 
 
 export function AdminUsersContent() {
   const { apiUrl, user: currentUser, setUser: setCurrentUser } = useAuth();
+  const { showFlash } = useFlash();
   const [users, setUsers] = useState<UserDTO[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -120,6 +122,7 @@ export function AdminUsersContent() {
       });
       setUsers((prev) => [created, ...(prev ?? [])]);
       closeCreateForm();
+      showFlash("success", `Usuario "${created.name}" creado correctamente.`);
     } catch (createErr) {
       setCreateError(
         createErr instanceof Error ? createErr.message : "No se pudo crear el usuario",
@@ -176,6 +179,7 @@ export function AdminUsersContent() {
       });
       applyUpdatedUser(updated);
       cancelEditing();
+      showFlash("success", `Usuario "${updated.name}" actualizado correctamente.`);
     } catch (saveError) {
       setEditError(
         saveError instanceof Error ? saveError.message : "No se pudo actualizar el usuario",
@@ -205,6 +209,10 @@ export function AdminUsersContent() {
     try {
       const updated = await updateUser(apiUrl, targetUser.id, { isActive: !targetUser.isActive });
       applyUpdatedUser(updated);
+      showFlash(
+        "success",
+        `Usuario "${updated.name}" ${updated.isActive ? "activado" : "desactivado"} correctamente.`,
+      );
     } catch (toggleError) {
       window.alert(
         toggleError instanceof Error ? toggleError.message : "No se pudo actualizar el usuario",
@@ -312,7 +320,11 @@ export function AdminUsersContent() {
             </div>
           </div>
 
-          {createError && <p className="mt-2 text-xs text-red-600">{createError}</p>}
+          {createError && (
+            <p role="alert" className="mt-2 text-xs text-red-600">
+              {createError}
+            </p>
+          )}
 
           <div className="mt-3 flex items-center gap-2">
             <button
@@ -364,7 +376,11 @@ export function AdminUsersContent() {
       </div>
 
       <div className="mt-6">
-        {error && <p className="text-sm text-red-600">No se pudieron cargar los usuarios.</p>}
+        {error && (
+          <p role="alert" className="text-sm text-red-600">
+            No se pudieron cargar los usuarios.
+          </p>
+        )}
 
         {!error && users === null && (
           <p className="text-sm text-muted-foreground">Cargando…</p>
@@ -437,6 +453,7 @@ export function AdminUsersContent() {
                           <input
                             id={`edit-password-${targetUser.id}`}
                             type="password"
+                            autoComplete="new-password"
                             value={editDraft.password}
                             onChange={(event) =>
                               setEditDraft({ ...editDraft, password: event.target.value })
@@ -472,7 +489,11 @@ export function AdminUsersContent() {
                         </div>
                       </div>
 
-                      {editError && <p className="text-xs text-red-600">{editError}</p>}
+                      {editError && (
+                        <p role="alert" className="text-xs text-red-600">
+                          {editError}
+                        </p>
+                      )}
 
                       <div className="flex items-center gap-2">
                         <button

@@ -5,6 +5,7 @@
   "packageManager": "npm@11.19.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
+    "predev": "bash scripts/exclude-build-dirs-from-icloud.sh",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",

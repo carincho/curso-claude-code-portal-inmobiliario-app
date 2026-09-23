@@ -72,7 +72,13 @@ export function ContactForm({
         <label htmlFor="contact-name" className={labelClassName}>
           Nombre
         </label>
-        <input id="contact-name" type="text" className={fieldClassName} {...register("name")} />
+        <input
+          id="contact-name"
+          type="text"
+          autoComplete="name"
+          className={fieldClassName}
+          {...register("name")}
+        />
         {errors.name && <p className={errorClassName}>{errors.name.message}</p>}
       </div>
 
@@ -83,6 +89,7 @@ export function ContactForm({
         <input
           id="contact-email"
           type="email"
+          autoComplete="email"
           className={fieldClassName}
           {...register("email")}
         />
@@ -93,7 +100,13 @@ export function ContactForm({
         <label htmlFor="contact-phone" className={labelClassName}>
           Teléfono
         </label>
-        <input id="contact-phone" type="tel" className={fieldClassName} {...register("phone")} />
+        <input
+          id="contact-phone"
+          type="tel"
+          autoComplete="tel"
+          className={fieldClassName}
+          {...register("phone")}
+        />
         {errors.phone && <p className={errorClassName}>{errors.phone.message}</p>}
       </div>
 
@@ -111,7 +124,9 @@ export function ContactForm({
       </div>
 
       {status === "error" && (
-        <p className="text-sm text-red-600">No pudimos enviar tu consulta. Intenta nuevamente.</p>
+        <p role="alert" className="text-sm text-red-600">
+          No pudimos enviar tu consulta. Intenta nuevamente.
+        </p>
       )}
 
       <button

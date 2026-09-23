@@ -168,6 +168,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background" data-admin-theme={theme}>
+      <a
+        href="#admin-main-content"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[60] focus-visible:rounded-md focus-visible:bg-accent focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-medium focus-visible:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        Saltar al contenido principal
+      </a>
       {mobileOpen && (
         <button
           type="button"
@@ -301,7 +307,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main id="admin-main-content" className="flex-1 p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );

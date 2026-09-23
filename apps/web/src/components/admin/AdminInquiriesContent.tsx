@@ -69,7 +69,11 @@ export function AdminInquiriesContent() {
       </div>
 
       <div className="mt-6">
-        {error && <p className="text-sm text-red-600">No se pudieron cargar las consultas.</p>}
+        {error && (
+          <p role="alert" className="text-sm text-red-600">
+            No se pudieron cargar las consultas.
+          </p>
+        )}
 
         {!error && inquiries === null && (
           <p className="text-sm text-muted-foreground">Cargando…</p>

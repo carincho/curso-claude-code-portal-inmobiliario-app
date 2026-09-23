@@ -108,7 +108,18 @@ packages/shared-types/  DTOs compartidos entre ambas apps (sin dependencia de Pr
 
 ### Progreso (Spec-Driven Development)
 - **Fase 1 — Fundamentos**: completa (Pasos 1-5).
-- **Fase 2 — Portal público**: en progreso. Completados: API REST pública con búsqueda/filtros/orden (Pasos 6, 10, 11, 12), landing page (Paso 7), `PropertyCard`/grid responsive (Paso 8), catálogo `/properties` (Paso 9), detalle `/properties/{id}` (Paso 13), galería de imágenes (Paso 14).
+- **Fase 2 — Portal público**: completa (Pasos 6-16).
+- **Fase 3 — Autenticación y usuario**: completa (Pasos 17-21).
+- **Fase 4 — Administración**: completa (Pasos 22-30).
+- **Fase 5 — Calidad y finalización**: completa (Pasos 31-37) — SEO/metadata dinámica con Open
+  Graph, optimización de consultas e imágenes, responsive/accesibilidad (skip links, jerarquía de
+  encabezados, `autocomplete`, `aria-live`), revisión de seguridad (incluida re-verificación de
+  `isActive`/rol vigente en cada request, no solo del JWT), QA integral y convergencia final SDD.
+- **Fase 6 — Mejoras de seguridad y experiencia**: completa (Pasos 38-40) — rate limiting de
+  login (5 intentos fallidos → bloqueo de 15 minutos, por cuenta, `User.failedLoginAttempts`/
+  `lockedUntil` en PostgreSQL), sistema de mensajes flash (`FlashProvider`) para login/logout y
+  administración de usuarios/propiedades/características, y rate limiting general de requests
+  (100/min por IP sobre `/api/**`, en memoria, `apps/api/src/proxy.ts`).
 - Progreso detallado y checklist: `specs/portal-inmobiliario/tasks.md`.
 
 ### Sistema de diseño (frontend)

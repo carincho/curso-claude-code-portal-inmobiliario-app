@@ -203,13 +203,13 @@
 
 ## Fase 5 — Calidad y finalización
 
-- [ ] **Paso 31 — SEO y metadata**
+- [x] **Paso 31 — SEO y metadata**
   - Metadata dinámica.
   - Título.
   - Descripción.
   - Open Graph.
 
-- [ ] **Paso 32 — Optimización**
+- [x] **Paso 32 — Optimización**
   - Optimizar imágenes Next.js/Cloudinary.
   - Evitar imágenes sobredimensionadas.
   - Revisar solicitudes duplicadas.
@@ -217,13 +217,13 @@
   - [x] Búsqueda insensible a acentos/ñ (extensión `unaccent`) en propiedades, usuarios y
     consultas del admin, y en el buscador público.
 
-- [ ] **Paso 33 — Responsive y accesibilidad**
+- [x] **Paso 33 — Responsive y accesibilidad**
   - Desktop.
   - Tablet.
   - Móvil.
   - Labels, teclado, foco, alt y semántica.
 
-- [ ] **Paso 34 — Seguridad**
+- [x] **Paso 34 — Seguridad**
   - Autenticación.
   - Autorización.
   - Validación REST.
@@ -233,14 +233,14 @@
   - Web3Forms.
   - Endpoints ADMIN.
 
-- [ ] **Paso 35 — QA integral**
+- [x] **Paso 35 — QA integral**
   - Flujos visitante.
   - Flujos USER.
   - Flujos ADMIN.
   - Errores y códigos HTTP.
   - Corregir defectos bloqueantes.
 
-- [ ] **Paso 36 — Cumplimiento arquitectónico**
+- [x] **Paso 36 — Cumplimiento arquitectónico**
   - Confirmar que no existen Server Actions.
   - Confirmar comunicación REST.
   - Confirmar PostgreSQL.
@@ -248,10 +248,37 @@
   - Confirmar permisos backend.
   - Confirmar integraciones externas.
 
-- [ ] **Paso 37 — Convergencia final del SDD**
+- [x] **Paso 37 — Convergencia final del SDD**
   - Releer `spec.md`.
   - Releer `plan.md`.
   - Comparar implementación con requisitos.
   - Corregir faltantes o inconsistencias.
   - Ejecutar build y validaciones finales.
   - Confirmar ausencia de errores bloqueantes.
+
+## Fase 6 — Mejoras de seguridad y experiencia (solicitadas por el usuario)
+
+- [x] **Paso 38 — Rate limiting de login**
+  - Bloquear una cuenta tras 5 intentos fallidos consecutivos (15 minutos).
+  - Reiniciar el contador tras un login exitoso.
+  - Aplicar la restricción en backend (`apps/api`), incluso con contraseña correcta durante el
+    bloqueo.
+  - Verificado con pruebas manuales (curl): 401 en los primeros 4 intentos, 429 al 5º y
+    posteriores, reset tras login exitoso.
+
+- [x] **Paso 39 — Mensajes flash**
+  - `FlashProvider` (Context de React) en el layout raíz de `apps/web`, visible tanto en el sitio
+    público como en `/admin`.
+  - Se muestran arriba de la página, se cierran manualmente o a los 5 segundos.
+  - Integrados en: login, logout, alta/edición/activación de usuarios, alta/edición/eliminación
+    de propiedades, creación/renombrado de características.
+  - Verificado visualmente en tema claro (sitio público) y oscuro (admin).
+
+- [x] **Paso 40 — Rate limiting general de requests**
+  - `apps/api/src/proxy.ts` (convención `proxy` de Next.js 16.0+, reemplaza `middleware.ts`):
+    100 requests/minuto por IP sobre `/api/:path*`, contador en memoria por proceso.
+  - `OPTIONS` (preflight CORS) excluido del conteo.
+  - Respuesta `429` con cabecera `Retry-After` y headers CORS, formato `{ message, status }`
+    consistente con `toErrorResponse`.
+  - Verificado en build de producción (`next start`): exactamente 100 requests permitidos, el
+    101º bloqueado; la ventana se libera pasado 1 minuto.

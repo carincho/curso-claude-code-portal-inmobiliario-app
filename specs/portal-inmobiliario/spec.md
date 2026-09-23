@@ -542,7 +542,58 @@ Las páginas públicas de propiedades deben generar metadata dinámica:
 
 ---
 
-## 26. Criterios de aceptación finales
+## 26. Rate limiting de login
+
+Para mitigar ataques de fuerza bruta, el login debe bloquear temporalmente una cuenta tras
+intentos fallidos repetidos:
+
+- máximo 5 intentos fallidos consecutivos por cuenta;
+- al alcanzar el límite, la cuenta queda bloqueada 15 minutos (incluso si en ese lapso se
+  ingresa la contraseña correcta);
+- un login exitoso reinicia el contador de intentos fallidos;
+- el bloqueo se verifica y aplica en backend (no es una restricción solo de interfaz);
+- el mensaje de error debe ser claro sin revelar información sensible adicional;
+- el bloqueo es **por cuenta** (identificada por email), no por IP ni por sesión del navegador:
+  una cuenta bloqueada no impide que otras cuentas (incluido un ADMIN) inicien sesión con
+  normalidad desde la misma máquina/red.
+
+---
+
+## 27. Rate limiting general de requests
+
+Además del bloqueo de login (que protege una cuenta puntual), `apps/api` debe limitar el volumen
+total de requests por origen para mitigar bombardeo de bots contra la API en general:
+
+- máximo 100 requests por minuto por IP, sobre todas las rutas `/api/**`;
+- superado el límite, responde `429` con cabecera `Retry-After`;
+- las peticiones `OPTIONS` (preflight de CORS) no cuentan contra el límite;
+- el contador vive en memoria del proceso de `apps/api` (no en PostgreSQL ni en un almacén
+  externo tipo Redis): se reinicia si el servidor reinicia, y no se comparte si en el futuro se
+  corre más de una instancia — suficiente para el alcance actual del proyecto (una sola
+  instancia). Ver `plan.md` §10 para el trade-off frente a una solución persistida.
+
+---
+
+## 28. Mensajes flash
+
+La aplicación debe mostrar mensajes flash (toast) de confirmación para operaciones relevantes:
+
+- inicio de sesión y cierre de sesión;
+- administración de usuarios (crear, editar, activar/desactivar);
+- administración de propiedades (crear, editar, eliminar);
+- creación y renombrado de características.
+
+Requisitos:
+
+- se muestran en la parte superior de la página (visibles sobre cualquier vista, pública o de
+  administración);
+- desaparecen automáticamente después de 5 segundos;
+- el usuario puede cerrarlos manualmente antes de que expiren;
+- son accesibles (anunciados a lectores de pantalla mediante `aria-live`).
+
+---
+
+## 29. Criterios de aceptación finales
 
 El producto está funcionalmente terminado cuando:
 
@@ -568,4 +619,7 @@ El producto está funcionalmente terminado cuando:
 - no se utilizan Server Actions;
 - la autorización se aplica en backend;
 - la aplicación es responsive;
+- el login bloquea una cuenta tras 5 intentos fallidos;
+- la API limita el volumen de requests por IP (100/minuto);
+- se muestran mensajes flash en las operaciones relevantes;
 - no existen errores bloqueantes conocidos.

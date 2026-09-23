@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useFlash } from "@/components/flash/FlashProvider";
 import {
   AdminPropertiesFilterPanel,
   countActiveFilters,
@@ -28,6 +29,7 @@ function FilterIcon() {
 
 export function AdminPropertiesListContent() {
   const { apiUrl } = useAuth();
+  const { showFlash } = useFlash();
   const [properties, setProperties] = useState<PropertyListItem[] | null>(null);
   const [error, setError] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -91,6 +93,7 @@ export function AdminPropertiesListContent() {
     try {
       await deleteAdminProperty(apiUrl, property.id);
       setReloadKey((key) => key + 1);
+      showFlash("success", `Propiedad "${property.title}" eliminada correctamente.`);
     } catch (deleteError) {
       window.alert(
         deleteError instanceof Error ? deleteError.message : "No se pudo eliminar la propiedad",
@@ -146,7 +149,9 @@ export function AdminPropertiesListContent() {
       <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">
           {error && (
-            <p className="text-sm text-red-600">No se pudieron cargar las propiedades.</p>
+            <p role="alert" className="text-sm text-red-600">
+              No se pudieron cargar las propiedades.
+            </p>
           )}
 
           {!error && properties === null && (

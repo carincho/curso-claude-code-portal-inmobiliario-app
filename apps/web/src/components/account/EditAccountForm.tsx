@@ -47,7 +47,13 @@ export function EditAccountForm() {
         <label htmlFor="edit-name" className={labelClassName}>
           Nombre
         </label>
-        <input id="edit-name" type="text" className={fieldClassName} {...register("name")} />
+        <input
+          id="edit-name"
+          type="text"
+          autoComplete="name"
+          className={fieldClassName}
+          {...register("name")}
+        />
         {errors.name && <p className={errorClassName}>{errors.name.message}</p>}
       </div>
 
@@ -55,7 +61,13 @@ export function EditAccountForm() {
         <label htmlFor="edit-email" className={labelClassName}>
           Email
         </label>
-        <input id="edit-email" type="email" className={fieldClassName} {...register("email")} />
+        <input
+          id="edit-email"
+          type="email"
+          autoComplete="email"
+          className={fieldClassName}
+          {...register("email")}
+        />
         {errors.email && <p className={errorClassName}>{errors.email.message}</p>}
       </div>
 
@@ -66,6 +78,7 @@ export function EditAccountForm() {
         <input
           id="edit-password"
           type="password"
+          autoComplete="new-password"
           className={fieldClassName}
           {...register("password")}
         />
@@ -75,7 +88,11 @@ export function EditAccountForm() {
         {errors.password && <p className={errorClassName}>{errors.password.message}</p>}
       </div>
 
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="text-sm text-red-600">
+          {serverError}
+        </p>
+      )}
 
       <div className="flex items-center gap-4">
         <button
