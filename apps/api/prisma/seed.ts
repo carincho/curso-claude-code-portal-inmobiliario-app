@@ -8,18 +8,19 @@ const TEST_USER_PASSWORD = "Password123!";
 
 const TEST_USERS: { name: string; email: string; role: Role }[] = [
   { name: "Usuario de Prueba", email: "usuario@portalinmobiliario.test", role: "USER" },
-  { name: "Administrador", email: "admin@portalinmobiliario.test", role: "ADMIN" },
+  { name: "Carincho", email: "carincho@portalinmobiliario.test", role: "ADMIN" },
 ];
 
 const FEATURE_NAMES = [
-  "Piscina",
+  "Piscina cosmica",
   "Gimnasio",
   "Quincho",
   "Lavandería",
   "Jardín",
   "Terraza",
   "Bodega",
-  "Ascensor",
+  "Ascensor de piso",
+  "Buhardilla cosmia",
   "Conserjería",
   "Seguridad",
   "Calefacción",
@@ -46,7 +47,14 @@ type PropertySeed = {
   isPublished: boolean;
   isFeatured: boolean;
   features: (typeof FEATURE_NAMES)[number][];
-  imageSeeds: string[];
+  // La mayoría de las propiedades usan imágenes de picsum.photos (imageSeeds).
+  // Algunas tienen además (o en vez de) fotos reales subidas a Cloudinary desde
+  // el panel admin (images), que se agregan después de las de imageSeeds en la
+  // lista combinada. mainImageIndex indica cuál de esa lista combinada es la
+  // imagen principal (por defecto la primera, índice 0).
+  imageSeeds?: string[];
+  images?: { url: string; publicId: string }[];
+  mainImageIndex?: number;
 };
 
 const PROPERTIES: PropertySeed[] = [
@@ -69,8 +77,15 @@ const PROPERTIES: PropertySeed[] = [
     region: "Ciudad de México",
     isPublished: true,
     isFeatured: true,
-    features: ["Gimnasio", "Piscina", "Ascensor", "Conserjería", "Seguridad"],
+    features: ["Gimnasio", "Piscina cosmica", "Ascensor de piso", "Conserjería", "Seguridad"],
     imageSeeds: ["polanco-depto-1", "polanco-depto-2", "polanco-depto-3"],
+    images: [
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790022335/propiedades-claude/torazbz1sqsvobfscrav.jpg",
+        publicId: "propiedades-claude/torazbz1sqsvobfscrav",
+      },
+    ],
+    mainImageIndex: 3,
   },
   {
     title: "Loft en Condesa cerca de Parque México",
@@ -133,7 +148,7 @@ const PROPERTIES: PropertySeed[] = [
     region: "Ciudad de México",
     isPublished: true,
     isFeatured: false,
-    features: ["Aire acondicionado", "Ascensor", "Seguridad"],
+    features: ["Aire acondicionado", "Ascensor de piso", "Seguridad"],
     imageSeeds: ["santafe-oficina-1", "santafe-oficina-2"],
   },
   {
@@ -178,7 +193,21 @@ const PROPERTIES: PropertySeed[] = [
     isPublished: true,
     isFeatured: false,
     features: ["Gimnasio", "Lavandería", "Conserjería"],
-    imageSeeds: ["chapalita-depto-1", "chapalita-depto-2"],
+    images: [
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046217/propiedades-claude/wx0plamutagzak7tlx94.jpg",
+        publicId: "propiedades-claude/wx0plamutagzak7tlx94",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046219/propiedades-claude/yoiimiujflh3dlp3zs1a.jpg",
+        publicId: "propiedades-claude/yoiimiujflh3dlp3zs1a",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046220/propiedades-claude/xcv8tasofleenb5yzilv.jpg",
+        publicId: "propiedades-claude/xcv8tasofleenb5yzilv",
+      },
+    ],
+    mainImageIndex: 1,
   },
   {
     title: "Residencia de lujo en San Pedro Garza García",
@@ -199,7 +228,7 @@ const PROPERTIES: PropertySeed[] = [
     region: "Nuevo León",
     isPublished: true,
     isFeatured: true,
-    features: ["Piscina", "Jardín", "Seguridad", "Aire acondicionado", "Quincho"],
+    features: ["Piscina cosmica", "Jardín", "Seguridad", "Aire acondicionado", "Quincho"],
     imageSeeds: ["sanpedro-casa-1", "sanpedro-casa-2", "sanpedro-casa-3"],
   },
   {
@@ -219,8 +248,33 @@ const PROPERTIES: PropertySeed[] = [
     region: "Nuevo León",
     isPublished: true,
     isFeatured: false,
-    features: ["Ascensor", "Aire acondicionado", "Seguridad"],
-    imageSeeds: ["valleoriente-oficina-1", "valleoriente-oficina-2"],
+    features: ["Ascensor de piso", "Aire acondicionado", "Seguridad"],
+    images: [
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046102/propiedades-claude/mspr09g4we3ttdi7pnch.jpg",
+        publicId: "propiedades-claude/mspr09g4we3ttdi7pnch",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046105/propiedades-claude/fw04outvtvz1d9bfjbqh.jpg",
+        publicId: "propiedades-claude/fw04outvtvz1d9bfjbqh",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046110/propiedades-claude/dwqka0xhxyi7fwvbtshd.jpg",
+        publicId: "propiedades-claude/dwqka0xhxyi7fwvbtshd",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046114/propiedades-claude/qr1e1ue2rq3xjxz51lfd.jpg",
+        publicId: "propiedades-claude/qr1e1ue2rq3xjxz51lfd",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046118/propiedades-claude/stdwvqtpoibphqdpuieb.jpg",
+        publicId: "propiedades-claude/stdwvqtpoibphqdpuieb",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046122/propiedades-claude/dgapj9xrzhqflhxthfgk.jpg",
+        publicId: "propiedades-claude/dgapj9xrzhqflhxthfgk",
+      },
+    ],
   },
   {
     title: "Terreno residencial en Juriquilla",
@@ -275,7 +329,7 @@ const PROPERTIES: PropertySeed[] = [
     region: "Quintana Roo",
     isPublished: true,
     isFeatured: true,
-    features: ["Piscina", "Gimnasio", "Aire acondicionado", "Seguridad"],
+    features: ["Piscina cosmica", "Gimnasio", "Aire acondicionado", "Seguridad"],
     imageSeeds: ["cancun-depto-1", "cancun-depto-2", "cancun-depto-3"],
   },
   {
@@ -299,6 +353,45 @@ const PROPERTIES: PropertySeed[] = [
     isFeatured: false,
     features: ["Jardín", "Aire acondicionado", "Pet friendly"],
     imageSeeds: ["merida-casa-1", "merida-casa-2"],
+  },
+  {
+    title: "Casa de Montaña con Vistas Panorámicas a la Cordillera",
+    description:
+      "Espectacular propiedad de montaña de arquitectura contemporánea alpina, emplazada en un terreno privilegiado con imponentes vistas despejadas a las altas cumbres de la **Cordillera de los Andes**.\n\nDiseñada para fundirse con la naturaleza mediante el uso de materiales nobles locales como **piedra volcánica, vigas a la vista y madera tratada termocontrolada (yakisugi / shou sugi ban)",
+    operationType: "SALE",
+    propertyType: "HOUSE",
+    price: 16000,
+    usableArea: 340,
+    totalArea: 3200,
+    bedrooms: 5,
+    bathrooms: 4,
+    parkingSpaces: 2,
+    age: 0,
+    address: "zapote 155 bis col isidro fabela CP 14030",
+    commune: "sur",
+    city: "mexico",
+    region: "tlalpan",
+    isPublished: true,
+    isFeatured: false,
+    features: ["Calefacción", "Aire acondicionado", "Lavandería", "Gimnasio", "Piscina cosmica"],
+    images: [
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046740/propiedades-claude/gbjr9ix3uy9yyp49oe1k.jpg",
+        publicId: "propiedades-claude/gbjr9ix3uy9yyp49oe1k",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046742/propiedades-claude/ggbivfihgkj3xack3w0w.jpg",
+        publicId: "propiedades-claude/ggbivfihgkj3xack3w0w",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046745/propiedades-claude/fdjewugkew25youij4ov.jpg",
+        publicId: "propiedades-claude/fdjewugkew25youij4ov",
+      },
+      {
+        url: "https://res.cloudinary.com/dgmaf5hpj/image/upload/v1790046747/propiedades-claude/tqymndmltvaj8umcpdmg.jpg",
+        publicId: "propiedades-claude/tqymndmltvaj8umcpdmg",
+      },
+    ],
   },
 ];
 
@@ -335,7 +428,19 @@ async function main() {
 
   console.log(`Creando ${PROPERTIES.length} propiedades...`);
   for (const property of PROPERTIES) {
-    const { features: featureNames, imageSeeds, ...propertyData } = property;
+    const { features: featureNames, imageSeeds, images, mainImageIndex, ...propertyData } =
+      property;
+
+    const combinedImages = [
+      ...(imageSeeds ?? []).map((seed) => ({ url: buildImageUrl(seed), publicId: `seed/${seed}` })),
+      ...(images ?? []),
+    ];
+    const imagesToCreate = combinedImages.map((image, index) => ({
+      url: image.url,
+      publicId: image.publicId,
+      position: index,
+      isMain: index === (mainImageIndex ?? 0),
+    }));
 
     await prisma.property.create({
       data: {
@@ -344,12 +449,7 @@ async function main() {
           connect: featureNames.map((name) => ({ id: featureIdByName.get(name) })),
         },
         images: {
-          create: imageSeeds.map((seed, index) => ({
-            url: buildImageUrl(seed),
-            publicId: `seed/${seed}`,
-            position: index,
-            isMain: index === 0,
-          })),
+          create: imagesToCreate,
         },
       },
     });
