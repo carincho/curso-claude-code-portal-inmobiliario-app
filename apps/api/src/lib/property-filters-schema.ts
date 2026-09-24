@@ -42,6 +42,9 @@ export const propertyFiltersSchema = z.object({
   commune: toArray(nonEmptyString),
   city: toArray(nonEmptyString),
   region: toArray(nonEmptyString),
+  // Se mantiene como enum de texto (en vez de z.coerce.boolean(), donde "false" también sería
+  // truthy) y se compara explícitamente contra "true" en el repositorio.
+  featured: z.enum(["true", "false"]).optional(),
   sort: z.enum(PROPERTY_SORT_OPTIONS).optional(),
   page: z.coerce.number().int().min(1).optional(),
   pageSize: z.coerce.number().int().min(1).max(MAX_PROPERTY_PAGE_SIZE).optional(),

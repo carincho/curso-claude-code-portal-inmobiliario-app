@@ -224,7 +224,9 @@ El catálogo debe:
 - contemplar estados de carga, vacío y error;
 - paginar los resultados en el servidor (no cargar todo el catálogo en el navegador), mostrando
   el número de página actual mediante un parámetro de consulta (`?page=2`) y controles de
-  navegación entre páginas.
+  navegación entre páginas;
+- agrupar las propiedades destacadas en una sección propia, antes del resto del catálogo, cuando
+  se muestra la vista por defecto (primera página, sin búsqueda ni filtros activos).
 
 Cada tarjeta mostrará, cuando corresponda:
 

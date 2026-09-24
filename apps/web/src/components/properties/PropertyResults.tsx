@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { PropertyGrid } from "@/components/properties/PropertyGrid";
 import { PropertyPagination } from "@/components/properties/PropertyPagination";
-import { fetchPublicProperties, type PropertyFilters } from "@/lib/properties-client";
+import {
+  fetchPublicProperties,
+  MAX_PROPERTY_PAGE_SIZE,
+  type PropertyFilters,
+} from "@/lib/properties-client";
 
 export async function PropertyResults({
   filters,
@@ -15,8 +19,27 @@ export async function PropertyResults({
   const { items: properties, page, totalPages, total } = await fetchPublicProperties(filters);
   const { search } = filters;
 
+  // La sección de destacadas solo tiene sentido en la vista por defecto del catálogo: si hay
+  // búsqueda, filtros o estamos en otra página, agruparlas confundiría los resultados mostrados.
+  const isDefaultView = !hasAnyFilter && page === 1;
+  const { items: featured } = isDefaultView
+    ? await fetchPublicProperties({
+        featured: "true",
+        pageSize: String(MAX_PROPERTY_PAGE_SIZE),
+      }).catch(() => ({ items: [] }))
+    : { items: [] };
+
   return (
     <>
+      {featured.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-4 text-xl font-semibold tracking-tight text-stone-900">
+            Propiedades destacadas
+          </h2>
+          <PropertyGrid properties={featured} />
+        </section>
+      )}
+
       <h2 className="sr-only">Resultados</h2>
       <p className="mb-6 text-sm text-stone-600">
         {search ? (

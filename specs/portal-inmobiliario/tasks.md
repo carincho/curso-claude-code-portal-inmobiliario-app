@@ -325,3 +325,18 @@
     navegador con las 13 propiedades del seed (9 en página 1, 4 en página 2) — controles
     anterior/primera deshabilitados en la página 1, siguiente/última deshabilitados en la última
     página, y los filtros (`operation`, `sort`) se preservan correctamente al cambiar de página.
+
+- [x] **Paso 43 — Agrupar propiedades destacadas en `/properties`**
+  - En la vista por defecto de `/properties` (primera página, sin búsqueda ni filtros activos),
+    mostrar una sección "Propiedades destacadas" antes del resto del catálogo paginado.
+  - `GET /api/properties` acepta un nuevo filtro `featured=true` (`propertyFiltersSchema`,
+    `apps/api/src/lib/property-filters-schema.ts`) que agrega `isFeatured: true` al `where` de
+    Prisma. Se descartó reutilizar la técnica de la landing (pedir el `pageSize` máximo y filtrar
+    en el cliente) porque el catálogo ya supera las 48 propiedades del máximo permitido, así que
+    esa técnica podía dejar fuera destacadas más allá de las primeras 48.
+  - La sección de destacadas no se muestra si hay búsqueda, filtros activos o `page > 1`, para no
+    generar agrupaciones confusas al paginar o filtrar.
+  - Verificado: build, lint y `tsc --noEmit` limpios en `apps/api` y `apps/web`; probado
+    manualmente contra la API (`curl "/api/properties?featured=true"`) y en el navegador con las
+    4 propiedades destacadas del seed — la sección aparece solo en la vista por defecto (con 73
+    propiedades publicadas en total) y desaparece al cambiar a `page=2`.

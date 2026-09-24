@@ -257,6 +257,15 @@ preservando el resto de los filtros activos en la query string. La landing page,
 curar destacadas/venta/arriendo sobre todo el catálogo publicado, pide una `pageSize` mayor
 (el máximo permitido) en lugar de paginar.
 
+En `/properties`, cuando se muestra la primera página sin búsqueda ni filtros activos, se hace una
+segunda llamada a `GET /api/properties?featured=true` para obtener las destacadas y renderizarlas
+en una sección propia sobre el resto del catálogo paginado. `featured` es un filtro nuevo
+(`isFeatured: true` en el `where` de Prisma, igual que el resto de los filtros de
+`propertyFiltersSchema`): la alternativa de reutilizar la técnica de la landing (pedir el
+`pageSize` máximo y filtrar en el cliente) no sirve aquí porque el catálogo ya supera las 48
+propiedades del máximo permitido, así que esa segunda llamada podía dejar fuera destacadas que
+cayeran más allá de las primeras 48.
+
 ## 10. Autenticación y autorización
 
 Utilizar un mecanismo seguro compatible con la API REST.

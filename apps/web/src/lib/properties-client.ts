@@ -20,6 +20,7 @@ export type PropertyFilters = {
   commune?: string[];
   city?: string[];
   region?: string[];
+  featured?: string;
   page?: string;
   pageSize?: string;
 };
