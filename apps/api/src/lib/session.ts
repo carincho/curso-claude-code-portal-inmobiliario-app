@@ -42,10 +42,16 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
   }
 }
 
+// `apps/web` y `apps/api` se despliegan en dominios distintos (ver plan.md §1),
+// así que el navegador los trata como sitios distintos entre sí: con
+// `sameSite: "lax"` la cookie de sesión nunca viaja en las llamadas fetch()
+// del frontend al backend, aunque sí en el login inicial (por eso el login
+// "funciona" pero todo lo demás devuelve 401). `"none"` es obligatorio para
+// que la cookie funcione cross-site, y exige `secure: true` (solo HTTPS).
 export const sessionCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  sameSite: process.env.NODE_ENV === "production" ? ("none" as const) : ("lax" as const),
   path: "/",
   maxAge: SESSION_DURATION_SECONDS,
 };
