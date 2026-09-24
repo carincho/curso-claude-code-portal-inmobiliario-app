@@ -27,6 +27,9 @@ export const PROPERTY_SORT_OPTIONS = [
   "area_desc",
 ] as const;
 
+export const DEFAULT_PROPERTY_PAGE_SIZE = 9;
+export const MAX_PROPERTY_PAGE_SIZE = 48;
+
 export const propertyFiltersSchema = z.object({
   search: z.string().trim().min(1).optional(),
   operation: operationTypeEnum.optional(),
@@ -40,6 +43,8 @@ export const propertyFiltersSchema = z.object({
   city: toArray(nonEmptyString),
   region: toArray(nonEmptyString),
   sort: z.enum(PROPERTY_SORT_OPTIONS).optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  pageSize: z.coerce.number().int().min(1).max(MAX_PROPERTY_PAGE_SIZE).optional(),
 });
 
 export type PropertyFilters = z.infer<typeof propertyFiltersSchema>;

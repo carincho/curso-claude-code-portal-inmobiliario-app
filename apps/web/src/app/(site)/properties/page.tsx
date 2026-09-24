@@ -61,6 +61,14 @@ export default async function PropertiesPage(props: PageProps<"/properties">) {
     hasEmptyParams = true;
   }
 
+  // La página 1 es la de por defecto: la omitimos de la URL para mantenerla limpia.
+  const rawPage = firstValue(rawSearchParams.page)?.trim();
+  if (rawPage && rawPage !== "1") {
+    filters.page = rawPage;
+  } else if (rawPage !== undefined) {
+    hasEmptyParams = true;
+  }
+
   for (const key of MULTI_KEYS) {
     const rawValue = rawSearchParams[key];
     const cleaned = toValues(rawValue);

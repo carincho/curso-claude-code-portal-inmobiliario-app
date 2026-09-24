@@ -232,9 +232,30 @@ commune
 city
 region
 sort
+page
+pageSize
 ```
 
-El filtrado y ordenamiento debe ejecutarse principalmente en PostgreSQL y no cargando todo el catálogo en el navegador.
+El filtrado, ordenamiento y paginado debe ejecutarse principalmente en PostgreSQL (`skip`/`take` +
+`count` sobre el mismo `where`) y no cargando todo el catálogo en el navegador.
+
+`page` (default `1`, mínimo `1`) y `pageSize` (default `9`, entre `1` y `48`) paginan
+`GET /api/properties`. La respuesta pasa de un array plano a un sobre paginado:
+
+```json
+{
+  "items": [ /* PropertyListItem[] */ ],
+  "page": 1,
+  "pageSize": 9,
+  "total": 37,
+  "totalPages": 5
+}
+```
+
+`apps/web` construye los controles de paginación (anterior/siguiente + números de página)
+preservando el resto de los filtros activos en la query string. La landing page, que necesita
+curar destacadas/venta/arriendo sobre todo el catálogo publicado, pide una `pageSize` mayor
+(el máximo permitido) en lugar de paginar.
 
 ## 10. Autenticación y autorización
 

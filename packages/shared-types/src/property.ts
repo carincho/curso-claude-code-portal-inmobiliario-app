@@ -58,6 +58,16 @@ export type PropertyLocations = {
   regions: string[];
 };
 
+export type PaginatedResult<T> = {
+  items: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};
+
+export type PaginatedProperties = PaginatedResult<PropertyListItem>;
+
 export type PropertyInput = {
   title: string;
   description: string;

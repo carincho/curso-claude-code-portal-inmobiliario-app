@@ -1,9 +1,11 @@
 import type {
+  PaginatedProperties,
   PropertyDetail,
-  PropertyListItem,
   PropertyLocations,
 } from "@portal-inmobiliario/shared-types";
 import { getApiUrl } from "@/lib/get-api-url";
+
+export const MAX_PROPERTY_PAGE_SIZE = 48;
 
 export type PropertyFilters = {
   search?: string;
@@ -18,6 +20,8 @@ export type PropertyFilters = {
   commune?: string[];
   city?: string[];
   region?: string[];
+  page?: string;
+  pageSize?: string;
 };
 
 export function buildFiltersQuery(filters: PropertyFilters) {
@@ -40,7 +44,7 @@ export function buildFiltersQuery(filters: PropertyFilters) {
 
 export async function fetchPublicProperties(
   filters: PropertyFilters = {},
-): Promise<PropertyListItem[]> {
+): Promise<PaginatedProperties> {
   const query = buildFiltersQuery(filters);
   const response = await fetch(`${getApiUrl()}/api/properties${query ? `?${query}` : ""}`, {
     cache: "no-store",

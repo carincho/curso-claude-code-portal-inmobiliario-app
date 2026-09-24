@@ -13,6 +13,7 @@ import {
   type PublishedProperty,
 } from "@/repositories/property.repository";
 import type {
+  PaginatedProperties,
   PropertyDetail,
   PropertyListItem,
   PropertyLocations,
@@ -76,9 +77,16 @@ export function toDetail(property: PublishedProperty): PropertyDetail {
 
 export async function listPublicProperties(
   filters: PropertyFilters = {},
-): Promise<PropertyListItem[]> {
-  const properties = await findPublishedProperties(filters);
-  return properties.map(toListItem);
+): Promise<PaginatedProperties> {
+  const { items, total, page, pageSize } = await findPublishedProperties(filters);
+
+  return {
+    items: items.map(toListItem),
+    page,
+    pageSize,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
 }
 
 export async function getPublicProperty(id: string): Promise<PropertyDetail> {

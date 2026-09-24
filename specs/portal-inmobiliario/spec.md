@@ -221,7 +221,10 @@ El catálogo debe:
 - mostrar únicamente propiedades publicadas;
 - utilizar un grid responsive;
 - utilizar tarjetas reutilizables;
-- contemplar estados de carga, vacío y error.
+- contemplar estados de carga, vacío y error;
+- paginar los resultados en el servidor (no cargar todo el catálogo en el navegador), mostrando
+  el número de página actual mediante un parámetro de consulta (`?page=2`) y controles de
+  navegación entre páginas.
 
 Cada tarjeta mostrará, cuando corresponda:
 

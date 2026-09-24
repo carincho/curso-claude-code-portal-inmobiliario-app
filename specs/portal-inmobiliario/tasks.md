@@ -303,3 +303,25 @@
     `apps/api` en el backend, igual que antes — Prisma conecta directo a Postgres sin pasar por
     el Data API de Supabase. Se usó el rol `postgres` existente en vez de crear un rol `prisma`
     dedicado (también decisión explícita del usuario).
+
+## Fase 8 — Paginación del catálogo público (solicitada por el usuario)
+
+- [x] **Paso 42 — Agregar paginación en `/properties`**
+  - `GET /api/properties` acepta `page` (default 1) y `pageSize` (default 9, máx. 48) y devuelve
+    un sobre paginado (`items`, `page`, `pageSize`, `total`, `totalPages`) en vez de un array
+    plano.
+  - El conteo y el recorte de resultados se ejecutan en PostgreSQL (`prisma.property.count` +
+    `skip`/`take` sobre el mismo `where` que el listado), no en el navegador.
+  - `/properties` muestra controles de paginación (`PropertyPagination.tsx`): primera, anterior,
+    números de página (rango de 3 hacia cada lado de la actual, con `…` cuando hay salto hasta la
+    primera/última), siguiente y última. Los controles preservan búsqueda, filtros y orden activos
+    en la query string (ej. `/properties?sort=price_desc&page=2`); `page=1` se omite de la URL
+    para mantenerla limpia, igual que `sort=newest`.
+  - La landing page (que cura destacadas/venta/arriendo sobre todo el catálogo publicado) pide el
+    `pageSize` máximo (48) en una sola llamada en vez de paginar.
+  - `/api/admin/properties` no se tocó: sigue devolviendo un array plano sin paginar (fuera de
+    alcance de este pedido).
+  - Verificado: build y lint limpios en `apps/api` y `apps/web`; probado manualmente en el
+    navegador con las 13 propiedades del seed (9 en página 1, 4 en página 2) — controles
+    anterior/primera deshabilitados en la página 1, siguiente/última deshabilitados en la última
+    página, y los filtros (`operation`, `sort`) se preservan correctamente al cambiar de página.

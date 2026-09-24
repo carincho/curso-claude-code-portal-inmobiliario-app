@@ -1,6 +1,10 @@
 import type { Prisma } from "@/generated/prisma/client";
 import type { PropertyInputPayload } from "@/lib/admin-property-schema";
-import type { AdminPropertyFilters, PropertyFilters } from "@/lib/property-filters-schema";
+import {
+  DEFAULT_PROPERTY_PAGE_SIZE,
+  type AdminPropertyFilters,
+  type PropertyFilters,
+} from "@/lib/property-filters-schema";
 import { prisma } from "@/lib/prisma";
 
 export const publicPropertyInclude = {
@@ -104,11 +108,22 @@ async function buildPropertyWhere(
 }
 
 export async function findPublishedProperties(filters: PropertyFilters = {}) {
-  return prisma.property.findMany({
-    where: await buildPropertyWhere(filters, { publishedOnly: true }),
-    include: listPropertyInclude,
-    orderBy: SORT_ORDER_BY[filters.sort ?? "newest"],
-  });
+  const where = await buildPropertyWhere(filters, { publishedOnly: true });
+  const page = filters.page ?? 1;
+  const pageSize = filters.pageSize ?? DEFAULT_PROPERTY_PAGE_SIZE;
+
+  const [items, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      include: listPropertyInclude,
+      orderBy: SORT_ORDER_BY[filters.sort ?? "newest"],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.property.count({ where }),
+  ]);
+
+  return { items, total, page, pageSize };
 }
 
 export function findPublishedPropertyById(id: string) {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PropertyGrid } from "@/components/properties/PropertyGrid";
+import { PropertyPagination } from "@/components/properties/PropertyPagination";
 import { fetchPublicProperties, type PropertyFilters } from "@/lib/properties-client";
 
 export async function PropertyResults({
@@ -11,7 +12,7 @@ export async function PropertyResults({
   hasOtherFilters: boolean;
   hasAnyFilter: boolean;
 }) {
-  const properties = await fetchPublicProperties(filters);
+  const { items: properties, page, totalPages, total } = await fetchPublicProperties(filters);
   const { search } = filters;
 
   return (
@@ -20,13 +21,11 @@ export async function PropertyResults({
       <p className="mb-6 text-sm text-stone-600">
         {search ? (
           <>
-            {properties.length} {properties.length === 1 ? "resultado" : "resultados"} para
-            &ldquo;{search}&rdquo;
+            {total} {total === 1 ? "resultado" : "resultados"} para &ldquo;{search}&rdquo;
           </>
         ) : (
           <>
-            {properties.length}{" "}
-            {properties.length === 1 ? "propiedad publicada" : "propiedades publicadas"}
+            {total} {total === 1 ? "propiedad publicada" : "propiedades publicadas"}
             {hasOtherFilters ? " con los filtros aplicados" : ""}
           </>
         )}
@@ -50,6 +49,8 @@ export async function PropertyResults({
               : undefined
         }
       />
+
+      <PropertyPagination filters={filters} page={page} totalPages={totalPages} />
     </>
   );
 }

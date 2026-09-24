@@ -1,10 +1,14 @@
 import { CallToAction } from "@/components/landing/CallToAction";
 import { Hero } from "@/components/landing/Hero";
 import { PropertySection } from "@/components/landing/PropertySection";
-import { fetchPublicProperties } from "@/lib/properties-client";
+import { fetchPublicProperties, MAX_PROPERTY_PAGE_SIZE } from "@/lib/properties-client";
 
 export default async function Home() {
-  const properties = await fetchPublicProperties().catch(() => []);
+  // La landing cura destacadas/venta/arriendo sobre todo el catálogo publicado, así que pide
+  // el pageSize máximo en vez de paginar.
+  const { items: properties } = await fetchPublicProperties({
+    pageSize: String(MAX_PROPERTY_PAGE_SIZE),
+  }).catch(() => ({ items: [] }));
 
   const featured = properties.filter((property) => property.isFeatured);
   const forSale = properties.filter((property) => property.operationType === "SALE").slice(0, 4);
